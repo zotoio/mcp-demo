@@ -1,0 +1,3 @@
+import { OrderContext } from '../contexts/order.context';
+import { Order, OrderItem } from '../models/order.model';
+export interface OrderProtocol { createOrder(userId:string,items:OrderItem[]):Promise<Order>; getOrder(id:string):Promise<Order|null>; getUserOrders(userId:string):Promise<Order[]>; updateOrderStatus(id:string,status:Order['status']):Promise<Order>; updateContext(context:Partial<OrderContext>):OrderContext; getContext():OrderContext; }
