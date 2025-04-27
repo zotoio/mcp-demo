@@ -35,6 +35,9 @@ class MCPServer {
         const parsedUrl = url.parse(req.url || '', true);
         const path = parsedUrl.pathname || '';
         
+        // Log the incoming request
+        console.log(`[MCP Server] ${req.method} ${path}`);
+        
         res.setHeader('Content-Type', 'application/json');
         
         try {
@@ -57,7 +60,9 @@ class MCPServer {
             
             const result = await resource.fetch(parsedUrl.query);
             res.statusCode = 200;
-            res.end(JSON.stringify(result));
+            const responseBody = JSON.stringify(result);
+            console.log(`[MCP Server] Response: ${responseBody.substring(0, 100)}${responseBody.length > 100 ? '...' : ''}`);
+            res.end(responseBody);
             return;
           }
           
@@ -86,9 +91,12 @@ class MCPServer {
             req.on('end', async () => {
               try {
                 const params = JSON.parse(body);
+                console.log(`[MCP Server] Tool params: ${JSON.stringify(params)}`);
                 const result = await tool.execute(params);
                 res.statusCode = 200;
-                res.end(JSON.stringify(result));
+                const responseBody = JSON.stringify(result);
+                console.log(`[MCP Server] Tool response: ${responseBody.substring(0, 100)}${responseBody.length > 100 ? '...' : ''}`);
+                res.end(responseBody);
               } catch (error) {
                 res.statusCode = 400;
                 res.end(JSON.stringify({ error: `Error executing tool: ${error}` }));
@@ -97,9 +105,11 @@ class MCPServer {
             return;
           }
           
+          console.log(`[MCP Server] 404 Not Found: ${path}`);
           res.statusCode = 404;
           res.end(JSON.stringify({ error: 'Not found' }));
         } catch (error) {
+          console.error(`[MCP Server] Error: ${error}`);
           res.statusCode = 500;
           res.end(JSON.stringify({ error: `Server error: ${error}` }));
         }
