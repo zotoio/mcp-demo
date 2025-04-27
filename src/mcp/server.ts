@@ -149,7 +149,7 @@ server.addResource({
       required: true
     }
   ],
-  async fetch(params: Record<string, any>) {
+  async fetch(params?: Record<string, any>) {
     const productId = params?.id as string;
     if (!productId) {
       throw new Error('Product ID is required');
@@ -178,7 +178,7 @@ server.addTool({
       required: true
     }
   ],
-  async execute(params: Record<string, any>) {
+  async execute(params?: Record<string, any>) {
     const query = params?.query as string;
     if (!query) {
       throw new Error('Search query is required');
@@ -213,7 +213,7 @@ server.addTool({
       required: true
     }
   ],
-  async execute(params: Record<string, any>) {
+  async execute(params?: Record<string, any>) {
     const userId = params?.userId as string;
     const items = params?.items as Array<{productId: string, quantity: number}>;
     
