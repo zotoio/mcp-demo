@@ -3,12 +3,17 @@ import { AuthService } from './services/auth.service';
 import { ProductService } from './services/product.service';
 import { OrderService } from './services/order.service';
 import { db } from './adapters/db.adapter';
+import { startMCPServer } from './mcp/server';
 
 const authService=new AuthService();
 const productService=new ProductService();
 const orderService=new OrderService();
 
 async function initializeApp(){
+  // Start the MCP server
+  const mcpServer = await startMCPServer(8080);
+  console.log('MCP Server initialized');
+  
   await db.seed();
   try{
     const products=await productService.listProducts();
