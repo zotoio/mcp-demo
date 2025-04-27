@@ -1,6 +1,5 @@
 import { AuthContext, createDefaultAuthContext } from '../contexts/auth.context';
 import { AuthProtocol } from '../protocols/auth.protocol';
-import { User } from '../models/user.model';
 import { db } from '../adapters/db.adapter';
 export class AuthService implements AuthProtocol {
   private context = createDefaultAuthContext();
@@ -11,7 +10,7 @@ export class AuthService implements AuthProtocol {
   getContext() {
     return this.context;
   }
-  async login(email: string, password: string) {
+  async login(email: string, _password: string) {
     const u = await db.findUserByEmail(email);
     if (!u) throw new Error('Not found');
     const t = Buffer.from(`${u.id}:${Date.now()}`).toString('base64');
@@ -20,7 +19,7 @@ export class AuthService implements AuthProtocol {
   async logout() {
     return this.updateContext(createDefaultAuthContext());
   }
-  async register(email: string, name: string, password: string) {
+  async register(email: string, name: string, _password: string) {
     if (await db.findUserByEmail(email)) throw new Error('Exists');
     const u = await db.createUser({ email, name, role: 'customer' });
     const t = Buffer.from(`${u.id}:${Date.now()}`).toString('base64');

@@ -10,8 +10,9 @@ const productService = new ProductService();
 const orderService = new OrderService();
 
 async function initializeApp() {
-  
-  console.log('MCP Server starting...');
+  // Start the MCP server
+  const mcpServer = await startMCPServer(8080);
+  console.log('MCP Server initialized');
 
   await db.seed();
   try {
