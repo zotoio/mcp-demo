@@ -1,12 +1,122 @@
-import { MCPServer, Resource, Tool, ToolCall } from '@modelcontextprotocol/typescript-sdk';
+import { Resource, Tool, MCPServerConfig } from './types';
 import { db } from '../adapters/db.adapter';
 import { Product } from '../models/product.model';
 import { Order } from '../models/order.model';
+import * as http from 'http';
+import * as url from 'url';
 
 /**
  * This file demonstrates how to create an MCP server that exposes your
  * product and order data through the Model Context Protocol.
  */
+
+// Custom MCP Server implementation
+class MCPServer {
+  private resources: Map<string, Resource> = new Map();
+  private tools: Map<string, Tool> = new Map();
+  private config: MCPServerConfig;
+  private httpServer: http.Server | null = null;
+
+  constructor(config: MCPServerConfig) {
+    this.config = config;
+  }
+
+  addResource(resource: Resource): void {
+    this.resources.set(resource.name, resource);
+  }
+
+  addTool(tool: Tool): void {
+    this.tools.set(tool.name, tool);
+  }
+
+  async listen(port: number): Promise<void> {
+    return new Promise((resolve) => {
+      this.httpServer = http.createServer(async (req, res) => {
+        const parsedUrl = url.parse(req.url || '', true);
+        const path = parsedUrl.pathname || '';
+        
+        res.setHeader('Content-Type', 'application/json');
+        
+        try {
+          if (path === '/resources' && req.method === 'GET') {
+            const resourceList = Array.from(this.resources.keys());
+            res.statusCode = 200;
+            res.end(JSON.stringify({ resources: resourceList }));
+            return;
+          }
+          
+          if (path.startsWith('/resources/') && req.method === 'GET') {
+            const resourceName = path.split('/')[2];
+            const resource = this.resources.get(resourceName);
+            
+            if (!resource) {
+              res.statusCode = 404;
+              res.end(JSON.stringify({ error: `Resource ${resourceName} not found` }));
+              return;
+            }
+            
+            const result = await resource.fetch(parsedUrl.query);
+            res.statusCode = 200;
+            res.end(JSON.stringify(result));
+            return;
+          }
+          
+          if (path === '/tools' && req.method === 'GET') {
+            const toolList = Array.from(this.tools.keys());
+            res.statusCode = 200;
+            res.end(JSON.stringify({ tools: toolList }));
+            return;
+          }
+          
+          if (path.startsWith('/tools/') && req.method === 'POST') {
+            const toolName = path.split('/')[2];
+            const tool = this.tools.get(toolName);
+            
+            if (!tool) {
+              res.statusCode = 404;
+              res.end(JSON.stringify({ error: `Tool ${toolName} not found` }));
+              return;
+            }
+            
+            let body = '';
+            req.on('data', chunk => {
+              body += chunk.toString();
+            });
+            
+            req.on('end', async () => {
+              try {
+                const params = JSON.parse(body);
+                const result = await tool.execute(params);
+                res.statusCode = 200;
+                res.end(JSON.stringify(result));
+              } catch (error) {
+                res.statusCode = 400;
+                res.end(JSON.stringify({ error: `Error executing tool: ${error}` }));
+              }
+            });
+            return;
+          }
+          
+          res.statusCode = 404;
+          res.end(JSON.stringify({ error: 'Not found' }));
+        } catch (error) {
+          res.statusCode = 500;
+          res.end(JSON.stringify({ error: `Server error: ${error}` }));
+        }
+      });
+      
+      this.httpServer.listen(port, () => {
+        resolve();
+      });
+    });
+  }
+  
+  close(): void {
+    if (this.httpServer) {
+      this.httpServer.close();
+    }
+  }
+}
 
 // Create a new MCP server
 const server = new MCPServer({
@@ -39,7 +149,7 @@ server.addResource({
       required: true
     }
   ],
-  async fetch(params) {
+  async fetch(params: Record<string, any>) {
     const productId = params?.id as string;
     if (!productId) {
       throw new Error('Product ID is required');
@@ -68,7 +178,7 @@ server.addTool({
       required: true
     }
   ],
-  async execute(params) {
+  async execute(params: Record<string, any>) {
     const query = params?.query as string;
     if (!query) {
       throw new Error('Search query is required');
@@ -103,7 +213,7 @@ server.addTool({
       required: true
     }
   ],
-  async execute(params) {
+  async execute(params: Record<string, any>) {
     const userId = params?.userId as string;
     const items = params?.items as Array<{productId: string, quantity: number}>;
     
