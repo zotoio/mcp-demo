@@ -1,2 +1,2 @@
 // Re-export types from the SDK
-export * from '@modelcontextprotocol/sdk';
+export * from "@modelcontextprotocol/sdk/types.js";

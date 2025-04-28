@@ -1,153 +1,82 @@
-import { MCPServer, MCPRequest, MCPResponse, MCPNextFunction } from '@modelcontextprotocol/sdk';
+import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { z } from "zod";
+import express from "express";
+import logger from "../utils/logger";
+import { db } from "../adapters/db.adapter";
+import { randomUUID } from "crypto";
 
-import { db } from '../adapters/db.adapter';
-
-/**
- * This file demonstrates how to create an MCP server that exposes your
- * product and order data through the Model Context Protocol.
- */
-
-// Create a new MCP server
-const server = new MCPServer({
-  name: 'E-Commerce MCP Server',
-  description: 'Provides access to product catalog and order information',
-  version: '1.0.0',
+// Create an MCP server
+const server = new McpServer({
+  name: "E-Commerce MCP Server",
+  description: "Provides access to product catalog and order information",
+  version: "1.0.0"
 });
 
-import logger from '../utils/logger';
-
-// Add request logging middleware
-server.use(async (req: MCPRequest, res: MCPResponse, next: MCPNextFunction) => {
-  logger.info({ method: req.method, path: req.path }, 'MCP Server request');
-
-  // Capture the original send method to log responses
-  const originalSend = res.send;
-  res.send = function (body: string) {
-    const preview = typeof body === 'string' ? body.substring(0, 100) : JSON.stringify(body).substring(0, 100);
-    logger.info({ preview: `${preview}...` }, 'MCP Server response');
-    return originalSend.call(this, body);
-  };
-
-  await next();
-});
-
-// Define resources for products
-server.addResource({
-  name: 'products',
-  description: 'Product catalog information',
-  async fetch() {
+// Add a resource for all products
+server.resource(
+  "products",
+  "products://all",
+  async (uri) => {
     const products = await db.listProducts();
     return {
-      content: JSON.stringify(products),
-      mediaType: 'application/json',
+      contents: [{
+        uri: uri.href,
+        text: JSON.stringify(products)
+      }]
     };
-  },
-});
+  }
+);
 
-// Define a resource for a specific product
-server.addResource({
-  name: 'product',
-  description: 'Information about a specific product',
-  parameters: [
-    {
-      name: 'id',
-      description: 'Product ID',
-      required: true,
-    },
-  ],
-  async fetch(params: { id: string; }) {
-    const productId = params?.id as string;
-    if (!productId) {
-      throw new Error('Product ID is required');
-    }
-
-    const product = await db.getProduct(productId);
+// Add a resource for a specific product
+server.resource(
+  "product",
+  new ResourceTemplate("products://{id}", { list: undefined }),
+  async (uri, { id }) => {
+    const product = await db.getProduct(id);
     if (!product) {
-      throw new Error(`Product with ID ${productId} not found`);
+      throw new Error(`Product with ID ${id} not found`);
     }
-
     return {
-      content: JSON.stringify(product),
-      mediaType: 'application/json',
+      contents: [{
+        uri: uri.href,
+        text: JSON.stringify(product)
+      }]
     };
-  },
-});
+  }
+);
 
-// Define interfaces for tool parameters
-interface SearchProductsParams {
-  query: string;
-}
-
-interface CreateOrderParams {
-  userId: string;
-  items: Array<{
-    productId: string;
-    quantity: number;
-  }>;
-}
-
-// Define a tool for searching products
-server.addTool({
-  name: 'searchProducts',
-  description: 'Search for products by name or description',
-  parameters: [
-    {
-      name: 'query',
-      description: 'Search query',
-      required: true,
-    },
-  ],
-  async execute(params: SearchProductsParams) {
-    logger.info({ params }, 'MCP Server tool params');
-
-    const query = params?.query as string;
-    if (!query) {
-      throw new Error('Search query is required');
-    }
-
+// Add a tool for searching products
+server.tool(
+  "searchProducts",
+  { query: z.string() },
+  async ({ query }) => {
     const allProducts = await db.listProducts();
     const results = allProducts.filter(
-      (p) =>
-        p.name.toLowerCase().includes(query.toLowerCase()) ||
-        p.description.toLowerCase().includes(query.toLowerCase())
+      (p) => p.name.toLowerCase().includes(query.toLowerCase()) || 
+             p.description.toLowerCase().includes(query.toLowerCase())
     );
-
-    const response = {
-      result: JSON.stringify(results),
-      mediaType: 'application/json',
+    
+    return {
+      content: [{ 
+        type: "text", 
+        text: JSON.stringify(results) 
+      }]
     };
+  }
+);
 
-    logger.info({ responsePreview: JSON.stringify(response).substring(0, 100) + '...' }, 'MCP Server tool response');
-    return response;
+// Add a tool for creating orders
+server.tool(
+  "createOrder",
+  { 
+    userId: z.string().uuid(), 
+    items: z.array(z.object({
+      productId: z.string().uuid(),
+      quantity: z.number().int().positive()
+    }))
   },
-});
-
-// Define a tool for creating orders
-server.addTool({
-  name: 'createOrder',
-  description: 'Create a new order',
-  parameters: [
-    {
-      name: 'userId',
-      description: 'User ID',
-      required: true,
-    },
-    {
-      name: 'items',
-      description: 'Order items (array of {productId, quantity})',
-      required: true,
-    },
-  ],
-  async execute(params: CreateOrderParams) {
-    logger.info({ params }, 'MCP Server tool params');
-
-    const userId = params?.userId as string;
-    const items = params?.items as Array<{ productId: string; quantity: number }>;
-
-    if (!userId || !items) {
-      throw new Error('User ID and items are required');
-    }
-
+  async ({ userId, items }) => {
     // Calculate prices and create order items
     const orderItems = [];
     for (const item of items) {
@@ -172,21 +101,93 @@ server.addTool({
       status: 'pending',
     });
 
-    const response = {
-      result: JSON.stringify(order),
-      mediaType: 'application/json',
+    return {
+      content: [{ 
+        type: "text", 
+        text: JSON.stringify(order) 
+      }]
     };
+  }
+);
 
-    logger.info({ responsePreview: JSON.stringify(response).substring(0, 100) + '...' }, 'MCP Server tool response');
-    return response;
-  },
-});
+// Export the server for use in the HTTP setup
+export { server };
 
-// Start the server
+// Function to start the MCP server with HTTP transport
 export async function startMCPServer(port = 8080) {
-  await server.listen(port);
-  logger.info({ port }, 'MCP Server running');
+  const app = express();
+  app.use(express.json());
+
+  // Map to store transports by session ID
+  const transports: { [sessionId: string]: StreamableHTTPServerTransport } = {};
+
+  // Handle POST requests for client-to-server communication
+  app.post('/mcp', async (req, res) => {
+    // Check for existing session ID
+    const sessionId = req.headers['mcp-session-id'] as string | undefined;
+    let transport: StreamableHTTPServerTransport;
+
+    if (sessionId && transports[sessionId]) {
+      // Reuse existing transport
+      transport = transports[sessionId];
+    } else if (!sessionId && req.body?.method === 'initialize') {
+      // New initialization request
+      transport = new StreamableHTTPServerTransport({
+        sessionIdGenerator: () => randomUUID(),
+        onsessioninitialized: (sessionId) => {
+          // Store the transport by session ID
+          transports[sessionId] = transport;
+        }
+      });
+
+      // Clean up transport when closed
+      transport.onclose = () => {
+        if (transport.sessionId) {
+          delete transports[transport.sessionId];
+        }
+      };
+
+      // Connect to the MCP server
+      await server.connect(transport);
+    } else {
+      // Invalid request
+      res.status(400).json({
+        jsonrpc: '2.0',
+        error: {
+          code: -32000,
+          message: 'Bad Request: No valid session ID provided',
+        },
+        id: null,
+      });
+      return;
+    }
+
+    // Handle the request
+    await transport.handleRequest(req, res, req.body);
+  });
+
+  // Reusable handler for GET and DELETE requests
+  const handleSessionRequest = async (req: express.Request, res: express.Response) => {
+    const sessionId = req.headers['mcp-session-id'] as string | undefined;
+    if (!sessionId || !transports[sessionId]) {
+      res.status(400).send('Invalid or missing session ID');
+      return;
+    }
+
+    const transport = transports[sessionId];
+    await transport.handleRequest(req, res);
+  };
+
+  // Handle GET requests for server-to-client notifications via SSE
+  app.get('/mcp', handleSessionRequest);
+
+  // Handle DELETE requests for session termination
+  app.delete('/mcp', handleSessionRequest);
+
+  // Start the server
+  app.listen(port, () => {
+    logger.info({ port }, 'MCP Server running');
+  });
+
   return server;
 }
-
-export { server };

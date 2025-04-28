@@ -1,35 +1,75 @@
-import logger from '../utils/logger';
-import { MCPClient } from '@modelcontextprotocol/sdk';
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+import logger from "../utils/logger";
 
 /**
  * This file demonstrates how to create an MCP client that connects to your MCP server.
  * In a real application, this would typically be in a separate project.
  */
 
-export async function createMCPClient() {
+export async function createMCPClient(serverUrl = 'http://localhost:8080/mcp') {
   // Create a new MCP client
-  const client = new MCPClient();
+  const client = new Client({
+    name: 'E-Commerce MCP Client',
+    version: '1.0.0'
+  });
 
   // Connect to the MCP server
-  await client.connect('http://localhost:8080');
-  logger.info(`Connected to MCP server at http://localhost:8080`);
-
-  // Example: Fetch all products
-  const productsResource = await client.fetchResource('products');
-  logger.info({products: JSON.parse(productsResource.content)}, 'Products retrieved');
-
-  // Example: Search for products
-  const searchResults = await client.executeTool('searchProducts', {
-    query: 'Product 1',
-  });
-  logger.info({results: JSON.parse(searchResults.result)}, 'Search results');
+  const transport = new StreamableHTTPClientTransport(
+    new URL(serverUrl)
+  );
+  
+  await client.connect(transport);
+  logger.info(`Connected to MCP server at ${serverUrl}`);
 
   return client;
+}
+
+// Example usage functions
+export async function listAllProducts(client: Client) {
+  const resource = await client.readResource({
+    uri: "products://all"
+  });
+  
+  return JSON.parse(resource.contents[0].text);
+}
+
+export async function searchProducts(client: Client, query: string) {
+  const result = await client.callTool({
+    name: "searchProducts",
+    arguments: {
+      query
+    }
+  });
+  
+  return JSON.parse(result.content[0].text);
+}
+
+export async function createOrder(client: Client, userId: string, items: Array<{productId: string, quantity: number}>) {
+  const result = await client.callTool({
+    name: "createOrder",
+    arguments: {
+      userId,
+      items
+    }
+  });
+  
+  return JSON.parse(result.content[0].text);
 }
 
 // This can be used for testing the client directly
 if (require.main === module) {
   createMCPClient()
-    .then(() => logger.info('MCP Client test completed'))
+    .then(async (client) => {
+      // Example: List all products
+      const products = await listAllProducts(client);
+      logger.info({products}, 'Products retrieved');
+      
+      // Example: Search for products
+      const searchResults = await searchProducts(client, 'Product 1');
+      logger.info({results: searchResults}, 'Search results');
+      
+      logger.info('MCP Client test completed');
+    })
     .catch((err) => logger.error({err}, 'MCP Client error'));
 }
