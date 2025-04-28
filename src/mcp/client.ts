@@ -1,4 +1,11 @@
-import { MCPClient } from '@modelcontextprotocol/sdk';
+// Try to import from the SDK, but fall back to our custom implementation if it fails
+let MCPClient: any;
+try {
+  MCPClient = require('@modelcontextprotocol/typescript-sdk').MCPClient;
+} catch (e) {
+  console.log('MCP SDK not found, using custom implementation');
+  MCPClient = require('./custom-implementation').MCPClient;
+}
 
 /**
  * This file demonstrates how to create an MCP client that connects to your MCP server.

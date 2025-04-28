@@ -1,4 +1,12 @@
-import { MCPServer } from '@modelcontextprotocol/sdk';
+// Try to import from the SDK, but fall back to our custom implementation if it fails
+let MCPServer: any;
+try {
+  MCPServer = require('@modelcontextprotocol/typescript-sdk').MCPServer;
+} catch (e) {
+  console.log('MCP SDK not found, using custom implementation');
+  MCPServer = require('./custom-implementation').MCPServer;
+}
+
 import { db } from '../adapters/db.adapter';
 
 /**
