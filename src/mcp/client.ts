@@ -1,5 +1,5 @@
 import logger from '../utils/logger';
-import { MCPClient } from '@modelcontextprotocol/typescript-sdk';
+import { MCPClient } from '@modelcontextprotocol/sdk/client';
 
 /**
  * This file demonstrates how to create an MCP client that connects to your MCP server.
