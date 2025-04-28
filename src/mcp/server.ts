@@ -1,6 +1,5 @@
 import { MCPServer } from '@modelcontextprotocol/sdk';
-import { Product } from '../models/product.model';
-import { Order } from '../models/order.model';
+import { db } from '../adapters/db.adapter';
 
 /**
  * This file demonstrates how to create an MCP server that exposes your
