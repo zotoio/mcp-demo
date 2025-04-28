@@ -31,7 +31,11 @@ export async function listAllProducts(client: Client) {
     uri: "products://all"
   });
   
-  return JSON.parse(resource.contents[0].text);
+  if (!resource.contents?.[0]?.text) {
+    throw new Error("Invalid resource response: missing text content");
+  }
+  
+  return JSON.parse(resource.contents[0].text as string);
 }
 
 export async function searchProducts(client: Client, query: string) {
@@ -42,7 +46,16 @@ export async function searchProducts(client: Client, query: string) {
     }
   });
   
-  return JSON.parse(result.content[0].text);
+  if (!result.content || !Array.isArray(result.content) || !result.content[0] || typeof result.content[0] !== 'object') {
+    throw new Error("Invalid tool response: missing or malformed content");
+  }
+  
+  const content = result.content[0] as { type: string; text: string };
+  if (!content.text) {
+    throw new Error("Invalid tool response: missing text in content");
+  }
+  
+  return JSON.parse(content.text);
 }
 
 export async function createOrder(client: Client, userId: string, items: Array<{productId: string, quantity: number}>) {
@@ -54,7 +67,16 @@ export async function createOrder(client: Client, userId: string, items: Array<{
     }
   });
   
-  return JSON.parse(result.content[0].text);
+  if (!result.content || !Array.isArray(result.content) || !result.content[0] || typeof result.content[0] !== 'object') {
+    throw new Error("Invalid tool response: missing or malformed content");
+  }
+  
+  const content = result.content[0] as { type: string; text: string };
+  if (!content.text) {
+    throw new Error("Invalid tool response: missing text in content");
+  }
+  
+  return JSON.parse(content.text);
 }
 
 // This can be used for testing the client directly
