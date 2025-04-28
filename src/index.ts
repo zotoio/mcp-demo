@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { AuthService } from './services/auth.service';
 import { ProductService } from './services/product.service';
 import { OrderService } from './services/order.service';
@@ -40,7 +40,7 @@ async function initializeApp() {
     console.error('Error', e);
   }
   const app = express();
-  app.get('/', (_req, res) => res.send('MCP Example running'));
+  app.get('/', (_req: Request, res: Response) => res.send('MCP Example running'));
   app.listen(3000, () => console.log('Server on http://localhost:3000'));
 }
 initializeApp().catch(console.error);
