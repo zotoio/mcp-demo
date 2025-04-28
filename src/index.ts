@@ -16,7 +16,7 @@ async function initializeApp() {
   await db.seed();
   
   // Start the MCP server
-  await startMCPServer(8080);
+  await startMCPServer(3000);
   logger.info('MCP Server initialized');
 
   // Test the application logic
