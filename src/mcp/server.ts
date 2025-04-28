@@ -1,4 +1,4 @@
-import { MCPServer, MCPRequest, MCPResponse, MCPNextFunction } from '@modelcontextprotocol/typescript-sdk';
+import { MCPServer, MCPRequest, MCPResponse, MCPNextFunction } from '@modelcontextprotocol/sdk';
 
 import { db } from '../adapters/db.adapter';
 

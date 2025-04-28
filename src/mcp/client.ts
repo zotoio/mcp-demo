@@ -1,5 +1,5 @@
 import logger from '../utils/logger';
-import { MCPClient } from '@modelcontextprotocol/sdk/client';
+import { MCPClient } from '@modelcontextprotocol/sdk';
 
 /**
  * This file demonstrates how to create an MCP client that connects to your MCP server.
