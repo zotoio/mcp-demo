@@ -40,7 +40,7 @@ async function initializeApp() {
     console.error('Error', e);
   }
   const app = express();
-  app.get('/', (_, res) => res.send('MCP Example running'));
+  app.get('/', (_req, res) => res.send('MCP Example running'));
   app.listen(3000, () => console.log('Server on http://localhost:3000'));
 }
 initializeApp().catch(console.error);
