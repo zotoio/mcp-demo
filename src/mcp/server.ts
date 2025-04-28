@@ -1,4 +1,4 @@
-import { MCPServer } from '@modelcontextprotocol/typescript-sdk';
+import { MCPServer, MCPRequest, MCPResponse, MCPNextFunction } from '@modelcontextprotocol/typescript-sdk';
 
 import { db } from '../adapters/db.adapter';
 
@@ -17,7 +17,7 @@ const server = new MCPServer({
 import logger from '../utils/logger';
 
 // Add request logging middleware
-server.use(async (req: { method: any; path: any; }, res: { send: (body: any) => any; }, next: () => any) => {
+server.use(async (req: MCPRequest, res: MCPResponse, next: MCPNextFunction) => {
   logger.info({ method: req.method, path: req.path }, 'MCP Server request');
 
   // Capture the original send method to log responses
@@ -73,6 +73,19 @@ server.addResource({
   },
 });
 
+// Define interfaces for tool parameters
+interface SearchProductsParams {
+  query: string;
+}
+
+interface CreateOrderParams {
+  userId: string;
+  items: Array<{
+    productId: string;
+    quantity: number;
+  }>;
+}
+
 // Define a tool for searching products
 server.addTool({
   name: 'searchProducts',
@@ -84,7 +97,7 @@ server.addTool({
       required: true,
     },
   ],
-  async execute(params: { query: string; }) {
+  async execute(params: SearchProductsParams) {
     logger.info({ params }, 'MCP Server tool params');
 
     const query = params?.query as string;
@@ -125,7 +138,7 @@ server.addTool({
       required: true,
     },
   ],
-  async execute(params: { userId: string; items: { productId: string; quantity: number; }[]; }) {
+  async execute(params: CreateOrderParams) {
     logger.info({ params }, 'MCP Server tool params');
 
     const userId = params?.userId as string;

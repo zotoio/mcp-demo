@@ -3,9 +3,18 @@ import logger from '../utils/logger';
 
 export class ApiAdapter {
   async processPayment(orderId: string, amount: number) {
-    logger.info({ orderId, amount }, 'Processing payment');
-    await new Promise((r) => setTimeout(r, 1000));
-    return Math.random() < 0.95;
+    try {
+      logger.info({ orderId, amount }, 'Processing payment');
+      await new Promise((r) => setTimeout(r, 1000));
+      const success = Math.random() < 0.95;
+      if (!success) {
+        logger.error({ orderId }, 'Payment processing failed');
+      }
+      return success;
+    } catch (error) {
+      logger.error({ orderId, error }, 'Payment processing error');
+      return false;
+    }
   }
   async notifyShipping(order: Order) {
     logger.info({ orderId: order.id }, 'Shipping order');

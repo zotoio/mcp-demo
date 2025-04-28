@@ -2,13 +2,13 @@ import { ProductContext, createDefaultProductContext } from '../contexts/product
 import { ProductProtocol } from '../protocols/product.protocol';
 import { db } from '../adapters/db.adapter';
 export class ProductService implements ProductProtocol {
-  private ctx = createDefaultProductContext();
+  private context = createDefaultProductContext();
   updateContext(u: Partial<ProductContext>) {
-    this.ctx = { ...this.ctx, ...u };
-    return this.ctx;
+    this.context = { ...this.context, ...u };
+    return this.context;
   }
   getContext() {
-    return this.ctx;
+    return this.context;
   }
   async listProducts() {
     this.updateContext({ isLoading: true, error: null });
@@ -17,7 +17,7 @@ export class ProductService implements ProductProtocol {
       this.updateContext({ availableProducts: p, isLoading: false });
       return p;
     } catch (e) {
-      this.updateContext({ isLoading: false, error: e instanceof Error ? e : new Error('err') });
+      this.updateContext({ isLoading: false, error: e instanceof Error ? e : new Error(`Failed to list products: ${String(e)}`) });
       throw e;
     }
   }
@@ -28,7 +28,7 @@ export class ProductService implements ProductProtocol {
       this.updateContext({ currentProduct: p, isLoading: false });
       return p;
     } catch (e) {
-      this.updateContext({ isLoading: false, error: e instanceof Error ? e : new Error('err') });
+      this.updateContext({ isLoading: false, error: e instanceof Error ? e : new Error(`Failed to get product: ${String(e)}`) });
       throw e;
     }
   }
@@ -42,7 +42,7 @@ export class ProductService implements ProductProtocol {
       this.updateContext({ availableProducts: r, isLoading: false });
       return r;
     } catch (e) {
-      this.updateContext({ isLoading: false, error: e instanceof Error ? e : new Error('err') });
+      this.updateContext({ isLoading: false, error: e instanceof Error ? e : new Error(`Failed to search products: ${String(e)}`) });
       throw e;
     }
   }
