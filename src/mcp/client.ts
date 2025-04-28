@@ -7,7 +7,7 @@ import logger from "../utils/logger";
  * In a real application, this would typically be in a separate project.
  */
 
-export async function createMCPClient(serverUrl = 'http://localhost:8080/mcp') {
+export async function createMCPClient(serverUrl = 'http://localhost:3000/mcp') {
   // Create a new MCP client
   const client = new Client({
     name: 'E-Commerce MCP Client',
