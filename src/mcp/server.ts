@@ -3,7 +3,8 @@ let MCPServer: any;
 try {
   MCPServer = require('@modelcontextprotocol/typescript-sdk').MCPServer;
 } catch (e) {
-  console.log('MCP SDK not found, using custom implementation');
+  const logger = require('../utils/logger').default;
+  logger.info('MCP SDK not found, using custom implementation');
   MCPServer = require('./custom-implementation').MCPServer;
 }
 
@@ -21,16 +22,17 @@ const server = new MCPServer({
   version: '1.0.0',
 });
 
+import logger from '../utils/logger';
+
 // Add request logging middleware
 server.use(async (req: { method: any; path: any; }, res: { send: (body: any) => any; }, next: () => any) => {
-  console.log(`[MCP Server] ${req.method} ${req.path}`);
+  logger.info({ method: req.method, path: req.path }, 'MCP Server request');
 
   // Capture the original send method to log responses
   const originalSend = res.send;
   res.send = function (body: string) {
-    console.log(
-      `[MCP Server] Response: ${typeof body === 'string' ? body.substring(0, 100) : JSON.stringify(body).substring(0, 100)}...`
-    );
+    const preview = typeof body === 'string' ? body.substring(0, 100) : JSON.stringify(body).substring(0, 100);
+    logger.info({ preview: `${preview}...` }, 'MCP Server response');
     return originalSend.call(this, body);
   };
 
@@ -91,7 +93,7 @@ server.addTool({
     },
   ],
   async execute(params: { query: string; }) {
-    console.log(`[MCP Server] Tool params: ${JSON.stringify(params)}`);
+    logger.info({ params }, 'MCP Server tool params');
 
     const query = params?.query as string;
     if (!query) {
@@ -110,7 +112,7 @@ server.addTool({
       mediaType: 'application/json',
     };
 
-    console.log(`[MCP Server] Tool response: ${JSON.stringify(response).substring(0, 100)}...`);
+    logger.info({ responsePreview: JSON.stringify(response).substring(0, 100) + '...' }, 'MCP Server tool response');
     return response;
   },
 });
@@ -132,7 +134,7 @@ server.addTool({
     },
   ],
   async execute(params: { userId: string; items: { productId: string; quantity: number; }[]; }) {
-    console.log(`[MCP Server] Tool params: ${JSON.stringify(params)}`);
+    logger.info({ params }, 'MCP Server tool params');
 
     const userId = params?.userId as string;
     const items = params?.items as Array<{ productId: string; quantity: number }>;
@@ -170,7 +172,7 @@ server.addTool({
       mediaType: 'application/json',
     };
 
-    console.log(`[MCP Server] Tool response: ${JSON.stringify(response).substring(0, 100)}...`);
+    logger.info({ responsePreview: JSON.stringify(response).substring(0, 100) + '...' }, 'MCP Server tool response');
     return response;
   },
 });
@@ -178,7 +180,7 @@ server.addTool({
 // Start the server
 export async function startMCPServer(port = 8080) {
   await server.listen(port);
-  console.log(`MCP Server running on port ${port}`);
+  logger.info({ port }, 'MCP Server running');
   return server;
 }
 

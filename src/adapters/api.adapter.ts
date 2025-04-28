@@ -1,13 +1,14 @@
 import { Order } from '../models/order.model';
+import logger from '../utils/logger';
 
 export class ApiAdapter {
   async processPayment(orderId: string, amount: number) {
-    console.log(`Processing payment for ${orderId} $${amount}`);
+    logger.info({ orderId, amount }, 'Processing payment');
     await new Promise((r) => setTimeout(r, 1000));
     return Math.random() < 0.95;
   }
   async notifyShipping(order: Order) {
-    console.log(`Shipping ${order.id}`);
+    logger.info({ orderId: order.id }, 'Shipping order');
     await new Promise((r) => setTimeout(r, 500));
     return true;
   }

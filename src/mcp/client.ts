@@ -1,9 +1,12 @@
+import logger from '../utils/logger';
+
 // Try to import from the SDK, but fall back to our custom implementation if it fails
 let MCPClient: any;
 try {
   MCPClient = require('@modelcontextprotocol/typescript-sdk').MCPClient;
 } catch (e) {
-  console.log('MCP SDK not found, using custom implementation');
+  const logger = require('../utils/logger').default;
+  logger.info('MCP SDK not found, using custom implementation');
   MCPClient = require('./custom-implementation').MCPClient;
 }
 
@@ -18,17 +21,17 @@ export async function createMCPClient() {
 
   // Connect to the MCP server
   await client.connect('http://localhost:8080');
-  console.log(`Connected to MCP server at http://localhost:8080`);
+  logger.info(`Connected to MCP server at http://localhost:8080`);
 
   // Example: Fetch all products
   const productsResource = await client.fetchResource('products');
-  console.log('Products:', JSON.parse(productsResource.content));
+  logger.info({products: JSON.parse(productsResource.content)}, 'Products retrieved');
 
   // Example: Search for products
   const searchResults = await client.executeTool('searchProducts', {
     query: 'Product 1',
   });
-  console.log('Search results:', JSON.parse(searchResults.result));
+  logger.info({results: JSON.parse(searchResults.result)}, 'Search results');
 
   return client;
 }
@@ -36,6 +39,6 @@ export async function createMCPClient() {
 // This can be used for testing the client directly
 if (require.main === module) {
   createMCPClient()
-    .then(() => console.log('MCP Client test completed'))
-    .catch((err) => console.error('MCP Client error:', err));
+    .then(() => logger.info('MCP Client test completed'))
+    .catch((err) => logger.error({err}, 'MCP Client error'));
 }
