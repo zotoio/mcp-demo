@@ -1,14 +1,5 @@
 import logger from '../utils/logger';
-
-// Try to import from the SDK, but fall back to our custom implementation if it fails
-let MCPClient: any;
-try {
-  MCPClient = require('@modelcontextprotocol/typescript-sdk').MCPClient;
-} catch (e) {
-  const logger = require('../utils/logger').default;
-  logger.info('MCP SDK not found, using custom implementation');
-  MCPClient = require('./custom-implementation').MCPClient;
-}
+import { MCPClient } from '@modelcontextprotocol/typescript-sdk';
 
 /**
  * This file demonstrates how to create an MCP client that connects to your MCP server.
