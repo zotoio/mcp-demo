@@ -16,8 +16,13 @@ async function initializeApp() {
   await db.seed();
   
   // Start the MCP server
-  await startMCPServer(3000);
+  await startMCPServer();
   logger.info('MCP Server initialized');
+
+  // Start the main API server
+  const app = express();
+  app.get('/', (_req: Request, res: Response) => res.send('MCP Example running'));
+  app.listen(3001, () => logger.info('Main API server running on http://localhost:3001'));
 
   // Test the application logic
   try {
@@ -57,10 +62,6 @@ async function initializeApp() {
     logger.error({ err: e }, 'Error in initialization');
   }
   
-  // Start the main API server
-  const app = express();
-  app.get('/', (_req: Request, res: Response) => res.send('MCP Example running'));
-  app.listen(3000, () => logger.info('Main API server running on http://localhost:3000'));
 }
 
 initializeApp().catch(err => logger.error({ err }, 'Application initialization failed'));

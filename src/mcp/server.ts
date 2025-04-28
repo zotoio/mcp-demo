@@ -114,7 +114,7 @@ server.tool(
 export { server };
 
 // Function to start the MCP server with HTTP transport
-export async function startMCPServer(port = 8080) {
+export async function startMCPServer(port = 3000) {
   const app = express();
   app.use(express.json());
 
