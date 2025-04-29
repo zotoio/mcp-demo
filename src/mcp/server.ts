@@ -110,10 +110,11 @@ export async function startServer(port = 3000) {
   );
   
   // Start the HTTP server with the MCP endpoint
-  const httpServer = server.createHttpServer({
+  server.listen({
+    port,
+    host: "0.0.0.0",
     path: "/mcp"
   });
-  httpServer.listen(port, "0.0.0.0");
   logger.info(`MCP Server listening on port ${port} with endpoint /mcp`);
   
   return server;
