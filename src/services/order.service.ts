@@ -1,6 +1,7 @@
-import { OrderContext, createDefaultOrderContext } from '../contexts/order.context';
-import { OrderProtocol } from '../protocols/order.protocol';
-import { Order, OrderItem } from '../models/order.model';
+import type { OrderContext} from '../contexts/order.context';
+import { createDefaultOrderContext } from '../contexts/order.context';
+import type { OrderProtocol } from '../protocols/order.protocol';
+import type { Order, OrderItem } from '../models/order.model';
 import { db } from '../adapters/db.adapter';
 import { api } from '../adapters/api.adapter';
 export class OrderService implements OrderProtocol {
@@ -30,10 +31,11 @@ export class OrderService implements OrderProtocol {
       this.updateContext({ currentOrder: uo, isProcessing: false });
       return uo;
     } catch (error) {
-      const err = error instanceof Error ? error : new Error(`Failed to create order: ${String(error)}`);
-      this.updateContext({ 
-        isProcessing: false, 
-        error: err
+      const err =
+        error instanceof Error ? error : new Error(`Failed to create order: ${String(error)}`);
+      this.updateContext({
+        isProcessing: false,
+        error: err,
       });
       throw err;
     }
@@ -45,10 +47,11 @@ export class OrderService implements OrderProtocol {
       this.updateContext({ currentOrder: o, isProcessing: false });
       return o;
     } catch (error) {
-      const err = error instanceof Error ? error : new Error(`Failed to get order: ${String(error)}`);
-      this.updateContext({ 
-        isProcessing: false, 
-        error: err
+      const err =
+        error instanceof Error ? error : new Error(`Failed to get order: ${String(error)}`);
+      this.updateContext({
+        isProcessing: false,
+        error: err,
       });
       throw err;
     }
@@ -60,10 +63,11 @@ export class OrderService implements OrderProtocol {
       this.updateContext({ orderHistory: os, isProcessing: false });
       return os;
     } catch (error) {
-      const err = error instanceof Error ? error : new Error(`Failed to get user orders: ${String(error)}`);
-      this.updateContext({ 
-        isProcessing: false, 
-        error: err
+      const err =
+        error instanceof Error ? error : new Error(`Failed to get user orders: ${String(error)}`);
+      this.updateContext({
+        isProcessing: false,
+        error: err,
       });
       throw err;
     }
@@ -77,10 +81,13 @@ export class OrderService implements OrderProtocol {
       this.updateContext({ currentOrder: uo, isProcessing: false });
       return uo;
     } catch (error) {
-      const err = error instanceof Error ? error : new Error(`Failed to update order status: ${String(error)}`);
-      this.updateContext({ 
-        isProcessing: false, 
-        error: err
+      const err =
+        error instanceof Error
+          ? error
+          : new Error(`Failed to update order status: ${String(error)}`);
+      this.updateContext({
+        isProcessing: false,
+        error: err,
       });
       throw err;
     }

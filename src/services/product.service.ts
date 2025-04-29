@@ -1,5 +1,6 @@
-import { ProductContext, createDefaultProductContext } from '../contexts/product.context';
-import { ProductProtocol } from '../protocols/product.protocol';
+import type { ProductContext} from '../contexts/product.context';
+import { createDefaultProductContext } from '../contexts/product.context';
+import type { ProductProtocol } from '../protocols/product.protocol';
 import { db } from '../adapters/db.adapter';
 export class ProductService implements ProductProtocol {
   private context = createDefaultProductContext();
@@ -17,7 +18,8 @@ export class ProductService implements ProductProtocol {
       this.updateContext({ availableProducts: p, isLoading: false });
       return p;
     } catch (error) {
-      const err = error instanceof Error ? error : new Error(`Failed to list products: ${String(error)}`);
+      const err =
+        error instanceof Error ? error : new Error(`Failed to list products: ${String(error)}`);
       this.updateContext({ isLoading: false, error: err });
       throw err;
     }
@@ -29,7 +31,8 @@ export class ProductService implements ProductProtocol {
       this.updateContext({ currentProduct: p, isLoading: false });
       return p;
     } catch (error) {
-      const err = error instanceof Error ? error : new Error(`Failed to get product: ${String(error)}`);
+      const err =
+        error instanceof Error ? error : new Error(`Failed to get product: ${String(error)}`);
       this.updateContext({ isLoading: false, error: err });
       throw err;
     }
@@ -44,7 +47,8 @@ export class ProductService implements ProductProtocol {
       this.updateContext({ availableProducts: r, isLoading: false });
       return r;
     } catch (error) {
-      const err = error instanceof Error ? error : new Error(`Failed to search products: ${String(error)}`);
+      const err =
+        error instanceof Error ? error : new Error(`Failed to search products: ${String(error)}`);
       this.updateContext({ isLoading: false, error: err });
       throw err;
     }
