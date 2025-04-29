@@ -1,15 +1,8 @@
 import express, { Request, Response } from 'express';
 import logger from './utils/logger';
-import { AuthService } from './services/auth.service';
-import { ProductService } from './services/product.service';
-import { OrderService } from './services/order.service';
 import { db } from './adapters/db.adapter';
 import { startServer } from './mcp/server';
 import { createMCPClient } from './mcp/client';
-
-const authService = new AuthService();
-const productService = new ProductService();
-const orderService = new OrderService();
 
 async function initializeApp() {
   try {
@@ -23,7 +16,7 @@ async function initializeApp() {
 
     // Start the main API server
     const app = express();
-    app.get('/', (_req: Request, res: Response) => res.send('MCP Example running'));
+    app.get('/', (_req, res) => res.send('MCP Example running'));
     app.listen(3001, () => logger.info('Main API server running on http://localhost:3001'));
     // Test the MCP client
     const client = await createMCPClient();

@@ -30,7 +30,8 @@ export async function startServer(port = 3000) {
   server.resource(
     "product",
     new ResourceTemplate("products://{id}", { list: undefined }),
-    async (uri, { id }) => {
+    async (uri, params) => {
+      const id = params.id as string;
       const product = await db.getProduct(id);
       if (!product) {
         throw new Error(`Product with ID ${id} not found`);
@@ -109,7 +110,8 @@ export async function startServer(port = 3000) {
   );
   
   // Start the HTTP server
-  await server.listen(port, "0.0.0.0");
+  const httpServer = server.createHttpServer();
+  httpServer.listen(port, "0.0.0.0");
   logger.info(`MCP Server listening on port ${port}`);
   
   return server;
