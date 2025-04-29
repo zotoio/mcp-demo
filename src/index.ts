@@ -19,8 +19,8 @@ async function initializeApp() {
     app.get('/', (_req: any, res: any) => res.send('MCP Example running'));
     app.listen(3001, () => logger.info('Main API server running on http://localhost:3001'));
     
-    // Wait a moment for the server to fully initialize
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Wait for the server to fully initialize
+    await new Promise(resolve => setTimeout(resolve, 2000));
     
     // Test the MCP client
     const client = await createMCPClient();
