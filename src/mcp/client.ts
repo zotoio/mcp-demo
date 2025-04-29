@@ -15,27 +15,59 @@ export async function createMCPClient(serverUrl = 'http://localhost:3000/mcp') {
     version: '1.0.0'
   });
 
+  logger.info({ serverUrl }, 'Attempting to connect to MCP server');
+  
   try {
     // Try connecting with the modern Streamable HTTP transport first
+    logger.debug('Creating StreamableHTTPClientTransport');
     const transport = new StreamableHTTPClientTransport(
-      new URL(serverUrl)
+      new URL(serverUrl),
+      { debug: true } // Enable debug logging in the transport
     );
     
+    logger.debug('Connecting client to transport');
     await client.connect(transport);
-    logger.info(`Connected to MCP server at ${serverUrl} using Streamable HTTP transport`);
+    logger.info({ 
+      serverUrl,
+      transportType: 'StreamableHTTP',
+      clientName: client.name,
+      clientVersion: client.version
+    }, `Connected to MCP server at ${serverUrl} using Streamable HTTP transport`);
+    
     return client;
   } catch (err) {
     // If that fails, try the older SSE transport as fallback
-    logger.warn({ err }, `Streamable HTTP connection failed, falling back to SSE transport`);
+    logger.warn({ 
+      err, 
+      errorMessage: err instanceof Error ? err.message : String(err),
+      errorStack: err instanceof Error ? err.stack : undefined,
+      serverUrl 
+    }, `Streamable HTTP connection failed, falling back to SSE transport`);
     
     try {
+      logger.debug('Creating SSEClientTransport as fallback');
       const baseUrl = new URL(serverUrl);
       const sseTransport = new SSEClientTransport(baseUrl);
+      
+      logger.debug('Connecting client to SSE transport');
       await client.connect(sseTransport);
-      logger.info(`Connected to MCP server using SSE transport`);
+      logger.info({ 
+        serverUrl,
+        transportType: 'SSE',
+        clientName: client.name,
+        clientVersion: client.version
+      }, `Connected to MCP server using SSE transport`);
+      
       return client;
     } catch (fallbackErr) {
-      logger.error({ err: fallbackErr }, `All connection attempts to MCP server failed`);
+      logger.error({ 
+        err: fallbackErr,
+        errorMessage: fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr),
+        errorStack: fallbackErr instanceof Error ? fallbackErr.stack : undefined,
+        serverUrl,
+        attemptedTransports: ['StreamableHTTP', 'SSE']
+      }, `All connection attempts to MCP server failed`);
+      
       throw fallbackErr;
     }
   }

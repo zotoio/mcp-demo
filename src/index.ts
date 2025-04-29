@@ -5,33 +5,77 @@ import { startServer } from './mcp/server';
 import { createMCPClient } from './mcp/client';
 
 async function initializeApp() {
+  logger.startup('MCP Example Application', '1.0.0');
+  
   try {
     // Seed the database
+    logger.info('Seeding database with initial data');
+    const startTime = Date.now();
     await db.seed();
+    logger.performance('Database seeding', Date.now() - startTime);
     logger.info('Database seeded successfully');
     
     // Start the MCP server
-    await startServer();
-    logger.info('MCP Server initialized');
+    logger.info('Starting MCP server');
+    const serverStartTime = Date.now();
+    const mcpServer = await startServer();
+    logger.performance('MCP Server startup', Date.now() - serverStartTime, {
+      serverName: mcpServer.name,
+      serverVersion: mcpServer.version
+    });
+    logger.info({
+      name: mcpServer.name,
+      version: mcpServer.version
+    }, 'MCP Server initialized');
 
     // Start the main API server
+    logger.info('Starting main API server');
     const app = express();
     app.get('/', (_req: any, res: any) => res.send('MCP Example running'));
-    app.listen(3001, () => logger.info('Main API server running on http://localhost:3001'));
+    app.listen(3001, () => {
+      logger.info({
+        port: 3001,
+        url: 'http://localhost:3001'
+      }, 'Main API server running on http://localhost:3001');
+    });
     
     // Wait for the server to fully initialize
+    logger.info('Waiting for server initialization');
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     // Test the MCP client
+    logger.info('Testing MCP client connection');
+    const clientStartTime = Date.now();
     const client = await createMCPClient();
+    logger.performance('MCP Client connection', Date.now() - clientStartTime);
+    
+    logger.info('Retrieving products via MCP');
+    const productsStartTime = Date.now();
     const mcpProducts = await client.readResource({ uri: "products://all" });
-    logger.info('MCP client connected successfully');
-    logger.info({ productCount: JSON.parse(mcpProducts.contents[0].text as string).length }, 
-      'Products retrieved via MCP');
+    const products = JSON.parse(mcpProducts.contents[0].text as string);
+    logger.performance('Products retrieval', Date.now() - productsStartTime, {
+      productCount: products.length
+    });
+    
+    logger.info({ 
+      productCount: products.length,
+      firstProduct: products[0]?.name,
+      clientName: client.name,
+      clientVersion: client.version
+    }, 'Products retrieved via MCP');
+    
+    logger.info('Application initialization completed successfully');
   } catch (err) {
-    logger.error({ err }, 'Error in initialization');
+    logger.error({ 
+      err, 
+      errorMessage: err instanceof Error ? err.message : String(err),
+      errorStack: err instanceof Error ? err.stack : undefined,
+      phase: 'initialization'
+    }, 'Error in application initialization');
+    
+    logger.shutdown('MCP Example Application', 'Initialization failed');
+    process.exit(1);
   }
-  
 }
 
 initializeApp().catch(err => logger.error({ err }, 'Application initialization failed'));

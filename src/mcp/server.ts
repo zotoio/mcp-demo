@@ -110,33 +110,67 @@ export async function startServer(port = 3000) {
   );
   
   // Start the HTTP server with the MCP endpoint
+  logger.info('Initializing StreamableHTTPServerTransport in stateless mode');
   const { StreamableHTTPServerTransport } = await import("@modelcontextprotocol/sdk/server/streamableHttp.js");
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: undefined, // Use stateless mode for simplicity
+    debug: true, // Enable debug logging in the transport
   });
   
   // Create an Express app to handle the HTTP requests
+  logger.info('Setting up Express server for MCP');
   const express = await import("express");
   const app = express.default();
   app.use(express.default.json());
   
   // Handle POST requests for client-to-server communication
   app.post('/mcp', async (req, res) => {
-    await transport.handleRequest(req, res, req.body);
+    logger.debug({
+      method: 'POST',
+      path: '/mcp',
+      headers: req.headers,
+      body: req.body
+    }, 'Received MCP request');
+    
+    try {
+      await transport.handleRequest(req, res, req.body);
+      logger.debug('MCP request handled successfully');
+    } catch (error) {
+      logger.error({ error }, 'Error handling MCP request');
+      if (!res.headersSent) {
+        res.status(500).json({
+          jsonrpc: '2.0',
+          error: {
+            code: -32603,
+            message: 'Internal server error',
+          },
+          id: null,
+        });
+      }
+    }
   });
   
   // Start the HTTP server
   const httpServer = app.listen(port, "0.0.0.0", () => {
-    logger.info(`MCP Server listening on port ${port} with endpoint /mcp`);
+    logger.info({
+      port,
+      endpoint: '/mcp',
+      serverName: server.name,
+      serverVersion: server.version
+    }, `MCP Server listening on port ${port} with endpoint /mcp`);
   });
   
   // Connect the MCP server to the transport
+  logger.info('Connecting MCP server to transport');
   await server.connect(transport);
+  logger.info('MCP server connected successfully');
   
   // Clean up when the server is closed
   httpServer.on('close', () => {
+    logger.info('HTTP server closing, cleaning up resources');
     transport.close();
     server.close();
+    logger.info('MCP server and transport closed');
   });
   
   return server;
