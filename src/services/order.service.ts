@@ -17,16 +17,16 @@ export class OrderService implements OrderProtocol {
     this.updateContext({ isProcessing: true, error: null });
     try {
       const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
-      const o = await db.createOrder({ userId: uid, items, total, status: 'pending' });
+      const o = db.createOrder({ userId: uid, items, total, status: 'pending' });
       if (!(await api.processPayment(o.id, total))) {
-        await db.updateOrderStatus(o.id, 'cancelled');
+        db.updateOrderStatus(o.id, 'cancelled');
         throw new Error(`Payment failed for order ${o.id}`);
       }
-      const uo = await db.updateOrderStatus(o.id, 'processing');
+      const uo = db.updateOrderStatus(o.id, 'processing');
       if (!uo) throw new Error(`Failed to update order ${o.id} to processing status`);
       for (const i of items) {
-        const p = await db.getProduct(i.productId);
-        if (p) await db.updateProductStock(p.id, p.stock - i.quantity);
+        const p = db.getProduct(i.productId);
+        if (p) db.updateProductStock(p.id, p.stock - i.quantity);
       }
       this.updateContext({ currentOrder: uo, isProcessing: false });
       return uo;
@@ -43,7 +43,7 @@ export class OrderService implements OrderProtocol {
   async getOrder(id: string) {
     this.updateContext({ isProcessing: true, error: null });
     try {
-      const o = await db.getOrder(id);
+      const o = db.getOrder(id);
       this.updateContext({ currentOrder: o, isProcessing: false });
       return o;
     } catch (error) {
@@ -59,7 +59,7 @@ export class OrderService implements OrderProtocol {
   async getUserOrders(uid: string) {
     this.updateContext({ isProcessing: true, error: null });
     try {
-      const os = await db.getUserOrders(uid);
+      const os = db.getUserOrders(uid);
       this.updateContext({ orderHistory: os, isProcessing: false });
       return os;
     } catch (error) {
@@ -75,7 +75,7 @@ export class OrderService implements OrderProtocol {
   async updateOrderStatus(id: string, status: Order['status']) {
     this.updateContext({ isProcessing: true, error: null });
     try {
-      const uo = await db.updateOrderStatus(id, status);
+      const uo = db.updateOrderStatus(id, status);
       if (!uo) throw new Error(`Order with ID ${id} not found`);
       if (status === 'shipped') await api.notifyShipping(uo);
       this.updateContext({ currentOrder: uo, isProcessing: false });

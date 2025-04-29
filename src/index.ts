@@ -59,7 +59,7 @@ async function initializeApp() {
     const productsStartTime = Date.now();
     const mcpProducts = await client.readResource({ uri: 'products://all' });
     const productsText = mcpProducts.contents[0]?.text as string;
-    const products = JSON.parse(productsText);
+    const products = JSON.parse(productsText) as Array<{ name: string }>;
     logger.performance('Products retrieval', Date.now() - productsStartTime, {
       productCount: products.length,
     });
@@ -76,11 +76,12 @@ async function initializeApp() {
 
     logger.info('Application initialization completed successfully');
   } catch (err) {
+    const error = err as Error;
     logger.error(
       {
-        err,
-        errorMessage: err instanceof Error ? err.message : String(err),
-        errorStack: err instanceof Error ? err.stack : undefined,
+        err: error,
+        errorMessage: error.message,
+        errorStack: error.stack,
         phase: 'initialization',
       },
       'Error in application initialization'

@@ -12,7 +12,7 @@ export class AuthService implements AuthProtocol {
     return this.context;
   }
   async login(email: string, _password: string) {
-    const u = await db.findUserByEmail(email);
+    const u = db.findUserByEmail(email);
     if (!u) throw new Error(`User with email ${email} not found`);
     const t = Buffer.from(`${u.id}:${Date.now()}`).toString('base64');
     return this.updateContext({ currentUser: u, isAuthenticated: true, token: t });
@@ -21,8 +21,8 @@ export class AuthService implements AuthProtocol {
     return this.updateContext(createDefaultAuthContext());
   }
   async register(email: string, name: string, _password: string) {
-    if (await db.findUserByEmail(email)) throw new Error(`User with email ${email} already exists`);
-    const u = await db.createUser({ email, name, role: 'customer' });
+    if (db.findUserByEmail(email)) throw new Error(`User with email ${email} already exists`);
+    const u = db.createUser({ email, name, role: 'customer' });
     const t = Buffer.from(`${u.id}:${Date.now()}`).toString('base64');
     return this.updateContext({ currentUser: u, isAuthenticated: true, token: t });
   }

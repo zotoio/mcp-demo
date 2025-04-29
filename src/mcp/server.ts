@@ -13,7 +13,7 @@ export async function startServer(port = 3000) {
 
   // Add a resource for all products
   server.resource('products', 'products://all', async (uri) => {
-    const products = await db.listProducts();
+    const products = db.listProducts();
     return {
       contents: [
         {
@@ -30,7 +30,7 @@ export async function startServer(port = 3000) {
     new ResourceTemplate('products://{id}', { list: undefined }),
     async (uri, params) => {
       const id = params.id as string;
-      const product = await db.getProduct(id);
+      const product = db.getProduct(id);
       if (!product) {
         throw new Error(`Product with ID ${id} not found`);
       }
@@ -47,7 +47,7 @@ export async function startServer(port = 3000) {
 
   // Add a tool for searching products
   server.tool('searchProducts', { query: z.string() }, async ({ query }) => {
-    const allProducts = await db.listProducts();
+    const allProducts = db.listProducts();
     const results = allProducts.filter(
       (p) =>
         p.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -80,7 +80,7 @@ export async function startServer(port = 3000) {
       // Calculate prices and create order items
       const orderItems = [];
       for (const item of items) {
-        const product = await db.getProduct(item.productId);
+        const product = db.getProduct(item.productId);
         if (!product) {
           throw new Error(`Product with ID ${item.productId} not found`);
         }
@@ -94,7 +94,7 @@ export async function startServer(port = 3000) {
 
       const total = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-      const order = await db.createOrder({
+      const order = db.createOrder({
         userId,
         items: orderItems,
         total,
@@ -124,9 +124,9 @@ export async function startServer(port = 3000) {
 
   // Create an Express app to handle the HTTP requests
   logger.info('Setting up Express server for MCP');
-  const express = await import('express');
-  const app = express.default();
-  const jsonMiddleware = express.default.json();
+  const expressModule = await import('express');
+  const app = expressModule.default();
+  const jsonMiddleware = expressModule.default.json();
   app.use(jsonMiddleware);
 
   // Handle POST requests for client-to-server communication
@@ -178,10 +178,10 @@ export async function startServer(port = 3000) {
   logger.info('MCP server connected successfully');
 
   // Clean up when the server is closed
-  httpServer.on('close', async () => {
+  httpServer.on('close', () => {
     logger.info('HTTP server closing, cleaning up resources');
-    await transport.close();
-    await server.close();
+    void transport.close();
+    void server.close();
     logger.info('MCP server and transport closed');
   });
 

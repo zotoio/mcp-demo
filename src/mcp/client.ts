@@ -96,7 +96,7 @@ export async function listAllProducts(client: Client) {
   }
 
   const text = resource.contents[0]?.text as string;
-  return JSON.parse(text);
+  return JSON.parse(text) as unknown;
 }
 
 export async function searchProducts(client: Client, query: string) {
@@ -122,7 +122,7 @@ export async function searchProducts(client: Client, query: string) {
   }
 
   const text = content.text;
-  return JSON.parse(text);
+  return JSON.parse(text) as unknown;
 }
 
 export async function createOrder(
@@ -153,7 +153,7 @@ export async function createOrder(
   }
 
   const text = content.text;
-  return JSON.parse(text);
+  return JSON.parse(text) as unknown;
 }
 
 // This can be used for testing the client directly
@@ -161,11 +161,11 @@ if (require.main === module) {
   createMCPClient()
     .then(async (client) => {
       // Example: List all products
-      const products = await listAllProducts(client);
+      const products = await listAllProducts(client) as Array<{ name: string }>;
       logger.info({ productCount: products.length }, 'Products retrieved');
 
       // Example: Search for products
-      const searchResults = await searchProducts(client, 'Product 1');
+      const searchResults = await searchProducts(client, 'Product 1') as Array<{ name: string }>;
       logger.info({ resultCount: searchResults.length }, 'Search results');
 
       logger.info('MCP Client test completed');

@@ -14,7 +14,7 @@ export class ProductService implements ProductProtocol {
   async listProducts() {
     this.updateContext({ isLoading: true, error: null });
     try {
-      const p = await db.listProducts();
+      const p = db.listProducts();
       this.updateContext({ availableProducts: p, isLoading: false });
       return p;
     } catch (error) {
@@ -27,7 +27,7 @@ export class ProductService implements ProductProtocol {
   async getProduct(id: string) {
     this.updateContext({ isLoading: true, error: null });
     try {
-      const p = await db.getProduct(id);
+      const p = db.getProduct(id);
       this.updateContext({ currentProduct: p, isLoading: false });
       return p;
     } catch (error) {
@@ -40,7 +40,7 @@ export class ProductService implements ProductProtocol {
   async searchProducts(q: string) {
     this.updateContext({ isLoading: true, error: null });
     try {
-      const a = await db.listProducts();
+      const a = db.listProducts();
       const r = a.filter(
         (i) => i.name.toLowerCase().includes(q) || i.description.toLowerCase().includes(q)
       );

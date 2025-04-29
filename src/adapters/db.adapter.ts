@@ -58,7 +58,7 @@ export class DatabaseAdapter {
     this.orders.set(id, up);
     return up;
   }
-  async seed() {
+  seed() {
     this.createUser({ email: 'admin@example.com', name: 'Admin User', role: 'admin' });
     this.createUser({
       email: 'customer@example.com',
