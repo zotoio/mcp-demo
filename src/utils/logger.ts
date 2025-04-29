@@ -1,19 +1,7 @@
 import pino from 'pino';
 
-// Create a logger instance with more detailed configuration
+// Create a basic logger instance without transport to avoid worker thread issues
 const logger = pino({
-  transport: {
-    target: 'pino-pretty',
-    options: {
-      colorize: true,
-      translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l o',
-      ignore: 'pid,hostname',
-      messageFormat: '{msg} {context}',
-      errorLikeObjectKeys: ['err', 'error'],
-      levelFirst: true,
-      // Remove customPrettifiers as functions can't be cloned for worker threads
-    },
-  },
   level: process.env.LOG_LEVEL || 'info',
   serializers: {
     err: pino.stdSerializers.err,
@@ -22,11 +10,15 @@ const logger = pino({
     res: pino.stdSerializers.res,
   },
   base: undefined, // Remove base log data like pid and hostname
-  timestamp: pino.stdTimeFunctions.isoTime, // Use built-in time function instead of custom one
-  redact: {
-    paths: ['req.headers.authorization', '*.password', '*.token'],
-    censor: '[REDACTED]',
-  },
+  timestamp: pino.stdTimeFunctions.isoTime,
+  transport: {
+    target: 'pino-pretty',
+    options: {
+      colorize: true,
+      translateTime: true,
+      ignore: 'pid,hostname',
+    }
+  }
 });
 
 // Add helper methods for common logging patterns
@@ -46,7 +38,7 @@ const enhancedLogger = {
   },
   // Log performance metrics
   performance: (operation: string, durationMs: number, metadata?: Record<string, unknown>) => {
-    logger.debug(
+    logger.info(
       { operation, durationMs, ...metadata },
       `${operation} completed in ${durationMs}ms`
     );
