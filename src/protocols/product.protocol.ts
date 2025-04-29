@@ -1,5 +1,5 @@
-import { ProductContext } from '../contexts/product.context';
-import { Product } from '../models/product.model';
+import type { ProductContext } from '../contexts/product.context';
+import type { Product } from '../models/product.model';
 export interface ProductProtocol {
   listProducts(): Promise<Product[]>;
   getProduct(id: string): Promise<Product | null>;

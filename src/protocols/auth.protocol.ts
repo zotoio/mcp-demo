@@ -1,5 +1,5 @@
-import { AuthContext } from '../contexts/auth.context';
-import { User } from '../models/user.model';
+import type { AuthContext } from '../contexts/auth.context';
+import type { User } from '../models/user.model';
 export interface AuthProtocol {
   login(email: string, password: string): Promise<AuthContext>;
   logout(): Promise<AuthContext>;

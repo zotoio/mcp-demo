@@ -1,5 +1,5 @@
-import { OrderContext } from '../contexts/order.context';
-import { Order, OrderItem } from '../models/order.model';
+import type { OrderContext } from '../contexts/order.context';
+import type { Order, OrderItem } from '../models/order.model';
 export interface OrderProtocol {
   createOrder(userId: string, items: OrderItem[]): Promise<Order>;
   getOrder(id: string): Promise<Order | null>;

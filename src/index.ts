@@ -77,7 +77,7 @@ async function initializeApp() {
     logger.info('Application initialization completed successfully');
   } catch (err) {
     const error = err as Error;
-    const typedError = error as Error;
+    const typedError = error;
     logger.error(
       {
         err: typedError,
