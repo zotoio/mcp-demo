@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
-import { User } from '../models/user.model';
-import { Product } from '../models/product.model';
-import { Order } from '../models/order.model';
+import type { User } from '../models/user.model';
+import type { Product } from '../models/product.model';
+import type { Order } from '../models/order.model';
 
 export class DatabaseAdapter {
   private users = new Map<string, User>();

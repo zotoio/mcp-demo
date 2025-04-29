@@ -1,5 +1,6 @@
-import { AuthContext, createDefaultAuthContext } from '../contexts/auth.context';
-import { AuthProtocol } from '../protocols/auth.protocol';
+import type { AuthContext} from '../contexts/auth.context';
+import { createDefaultAuthContext } from '../contexts/auth.context';
+import type { AuthProtocol } from '../protocols/auth.protocol';
 import { db } from '../adapters/db.adapter';
 export class AuthService implements AuthProtocol {
   private context = createDefaultAuthContext();
