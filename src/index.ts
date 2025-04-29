@@ -20,12 +20,12 @@ async function initializeApp() {
     const serverStartTime = Date.now();
     const mcpServer = await startServer();
     logger.performance('MCP Server startup', Date.now() - serverStartTime, {
-      serverName: mcpServer.options?.name,
-      serverVersion: mcpServer.options?.version
+      serverName: 'E-Commerce MCP Server', // Use hardcoded values from server.ts
+      serverVersion: '1.0.0'
     });
     logger.info({
-      name: mcpServer.options?.name,
-      version: mcpServer.options?.version
+      name: 'E-Commerce MCP Server',
+      version: '1.0.0'
     }, 'MCP Server initialized');
 
     // Start the main API server
@@ -60,8 +60,8 @@ async function initializeApp() {
     logger.info({ 
       productCount: products.length,
       firstProduct: products[0]?.name,
-      clientName: client.options?.name,
-      clientVersion: client.options?.version
+      clientName: 'E-Commerce MCP Client', // Use hardcoded values from client.ts
+      clientVersion: '1.0.0'
     }, 'Products retrieved via MCP');
     
     logger.info('Application initialization completed successfully');

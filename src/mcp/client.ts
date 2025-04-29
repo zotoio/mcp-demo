@@ -30,8 +30,8 @@ export async function createMCPClient(serverUrl = 'http://localhost:3000/mcp') {
     logger.info({ 
       serverUrl,
       transportType: 'StreamableHTTP',
-      clientName: client.options?.name,
-      clientVersion: client.options?.version
+      clientName: 'E-Commerce MCP Client', // Use hardcoded values
+      clientVersion: '1.0.0'
     }, `Connected to MCP server at ${serverUrl} using Streamable HTTP transport`);
     
     return client;
@@ -54,8 +54,8 @@ export async function createMCPClient(serverUrl = 'http://localhost:3000/mcp') {
       logger.info({ 
         serverUrl,
         transportType: 'SSE',
-        clientName: client.options?.name,
-        clientVersion: client.options?.version
+        clientName: 'E-Commerce MCP Client', // Use hardcoded values
+        clientVersion: '1.0.0'
       }, `Connected to MCP server using SSE transport`);
       
       return client;

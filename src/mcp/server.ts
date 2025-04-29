@@ -155,8 +155,8 @@ export async function startServer(port = 3000) {
     logger.info({
       port,
       endpoint: '/mcp',
-      serverName: server.options?.name,
-      serverVersion: server.options?.version
+      serverName: 'E-Commerce MCP Server', // Use hardcoded values
+      serverVersion: '1.0.0'
     }, `MCP Server listening on port ${port} with endpoint /mcp`);
   });
   
