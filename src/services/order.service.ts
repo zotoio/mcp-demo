@@ -40,7 +40,7 @@ export class OrderService implements OrderProtocol {
       throw err;
     }
   }
-  async getOrder(id: string) {
+  getOrder(id: string): Promise<Order | null> {
     this.updateContext({ isProcessing: true, error: null });
     try {
       const o = db.getOrder(id);
@@ -56,7 +56,7 @@ export class OrderService implements OrderProtocol {
       throw err;
     }
   }
-  async getUserOrders(uid: string) {
+  getUserOrders(uid: string): Promise<Order[]> {
     this.updateContext({ isProcessing: true, error: null });
     try {
       const os = db.getUserOrders(uid);

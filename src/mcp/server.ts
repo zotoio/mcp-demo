@@ -12,7 +12,7 @@ export async function startServer(port = 3000) {
   });
 
   // Add a resource for all products
-  server.resource('products', 'products://all', async (uri) => {
+  server.resource('products', 'products://all', (uri) => {
     const products = db.listProducts();
     return {
       contents: [
@@ -28,7 +28,7 @@ export async function startServer(port = 3000) {
   server.resource(
     'product',
     new ResourceTemplate('products://{id}', { list: undefined }),
-    async (uri, params) => {
+    (uri, params) => {
       const id = params.id as string;
       const product = db.getProduct(id);
       if (!product) {
@@ -46,7 +46,7 @@ export async function startServer(port = 3000) {
   );
 
   // Add a tool for searching products
-  server.tool('searchProducts', { query: z.string() }, async ({ query }) => {
+  server.tool('searchProducts', { query: z.string() }, ({ query }) => {
     const allProducts = db.listProducts();
     const results = allProducts.filter(
       (p) =>
@@ -76,7 +76,7 @@ export async function startServer(port = 3000) {
         })
       ),
     },
-    async ({ userId, items }) => {
+    ({ userId, items }) => {
       // Calculate prices and create order items
       const orderItems = [];
       for (const item of items) {

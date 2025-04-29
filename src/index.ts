@@ -11,7 +11,7 @@ async function initializeApp() {
     // Seed the database
     logger.info('Seeding database with initial data');
     const startTime = Date.now();
-    await db.seed();
+    db.seed();
     logger.performance('Database seeding', Date.now() - startTime);
     logger.info('Database seeded successfully');
 
