@@ -34,7 +34,7 @@ async function initializeApp() {
     // Start the main API server
     logger.info('Starting main API server');
     const app = express();
-    app.get('/', (_req: any, res: any) => res.send('MCP Example running'));
+    app.get('/', (_req: express.Request, res: express.Response) => res.send('MCP Example running'));
     app.listen(3001, () => {
       logger.info(
         {
@@ -58,7 +58,8 @@ async function initializeApp() {
     logger.info('Retrieving products via MCP');
     const productsStartTime = Date.now();
     const mcpProducts = await client.readResource({ uri: 'products://all' });
-    const products = JSON.parse(mcpProducts.contents[0].text as string);
+    const productsText = mcpProducts.contents[0]?.text as string;
+    const products = JSON.parse(productsText);
     logger.performance('Products retrieval', Date.now() - productsStartTime, {
       productCount: products.length,
     });
@@ -66,7 +67,7 @@ async function initializeApp() {
     logger.info(
       {
         productCount: products.length,
-        firstProduct: products[0]?.name,
+        firstProduct: products[0]?.name || 'unknown',
         clientName: 'E-Commerce MCP Client', // Use hardcoded values from client.ts
         clientVersion: '1.0.0',
       },

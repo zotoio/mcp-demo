@@ -17,7 +17,7 @@ export class AuthService implements AuthProtocol {
     const t = Buffer.from(`${u.id}:${Date.now()}`).toString('base64');
     return this.updateContext({ currentUser: u, isAuthenticated: true, token: t });
   }
-  async logout() {
+  logout() {
     return this.updateContext(createDefaultAuthContext());
   }
   async register(email: string, name: string, _password: string) {

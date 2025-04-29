@@ -126,7 +126,8 @@ export async function startServer(port = 3000) {
   logger.info('Setting up Express server for MCP');
   const express = await import('express');
   const app = express.default();
-  app.use(express.default.json());
+  const jsonMiddleware = express.default.json();
+  app.use(jsonMiddleware);
 
   // Handle POST requests for client-to-server communication
   app.post('/mcp', async (req, res) => {
@@ -177,10 +178,10 @@ export async function startServer(port = 3000) {
   logger.info('MCP server connected successfully');
 
   // Clean up when the server is closed
-  httpServer.on('close', () => {
+  httpServer.on('close', async () => {
     logger.info('HTTP server closing, cleaning up resources');
-    transport.close();
-    server.close();
+    await transport.close();
+    await server.close();
     logger.info('MCP server and transport closed');
   });
 

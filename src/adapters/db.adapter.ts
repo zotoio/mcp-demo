@@ -7,51 +7,51 @@ export class DatabaseAdapter {
   private users = new Map<string, User>();
   private products = new Map<string, Product>();
   private orders = new Map<string, Order>();
-  async findUserByEmail(email: string) {
+  findUserByEmail(email: string) {
     for (const u of this.users.values()) if (u.email === email) return u;
     return null;
   }
-  async createUser(data: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) {
+  createUser(data: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) {
     const now = new Date();
     const u = { id: uuidv4(), ...data, createdAt: now, updatedAt: now };
     this.users.set(u.id, u);
     return u;
   }
-  async getUser(id: string) {
+  getUser(id: string) {
     return this.users.get(id) || null;
   }
-  async listProducts() {
+  listProducts() {
     return Array.from(this.products.values());
   }
-  async getProduct(id: string) {
+  getProduct(id: string) {
     return this.products.get(id) || null;
   }
-  async createProduct(data: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) {
+  createProduct(data: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) {
     const now = new Date();
     const p = { id: uuidv4(), ...data, createdAt: now, updatedAt: now };
     this.products.set(p.id, p);
     return p;
   }
-  async updateProductStock(id: string, stock: number) {
+  updateProductStock(id: string, stock: number) {
     const p = this.products.get(id);
     if (!p) return null;
     const up = { ...p, stock, updatedAt: new Date() };
     this.products.set(id, up);
     return up;
   }
-  async createOrder(data: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>) {
+  createOrder(data: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>) {
     const now = new Date();
     const o = { id: uuidv4(), ...data, createdAt: now, updatedAt: now };
     this.orders.set(o.id, o);
     return o;
   }
-  async getOrder(id: string) {
+  getOrder(id: string) {
     return this.orders.get(id) || null;
   }
-  async getUserOrders(userId: string) {
+  getUserOrders(userId: string) {
     return Array.from(this.orders.values()).filter((o) => o.userId === userId);
   }
-  async updateOrderStatus(id: string, status: Order['status']) {
+  updateOrderStatus(id: string, status: Order['status']) {
     const o = this.orders.get(id);
     if (!o) return null;
     const up = { ...o, status, updatedAt: new Date() };
@@ -59,25 +59,25 @@ export class DatabaseAdapter {
     return up;
   }
   async seed() {
-    await this.createUser({ email: 'admin@example.com', name: 'Admin User', role: 'admin' });
-    await this.createUser({
+    this.createUser({ email: 'admin@example.com', name: 'Admin User', role: 'admin' });
+    this.createUser({
       email: 'customer@example.com',
       name: 'Test Customer',
       role: 'customer',
     });
-    await this.createProduct({
+    this.createProduct({
       name: 'Product 1',
       description: 'This is the first product',
       price: 19.99,
       stock: 100,
     });
-    await this.createProduct({
+    this.createProduct({
       name: 'Product 2',
       description: 'This is the second product',
       price: 29.99,
       stock: 50,
     });
-    await this.createProduct({
+    this.createProduct({
       name: 'Product 3',
       description: 'This is the third product',
       price: 39.99,

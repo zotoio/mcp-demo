@@ -95,7 +95,8 @@ export async function listAllProducts(client: Client) {
     throw new Error('Invalid resource response: missing text content');
   }
 
-  return JSON.parse(resource.contents[0].text as string);
+  const text = resource.contents[0]?.text as string;
+  return JSON.parse(text);
 }
 
 export async function searchProducts(client: Client, query: string) {
@@ -120,7 +121,8 @@ export async function searchProducts(client: Client, query: string) {
     throw new Error('Invalid tool response: missing text in content');
   }
 
-  return JSON.parse(content.text);
+  const text = content.text;
+  return JSON.parse(text);
 }
 
 export async function createOrder(
@@ -150,7 +152,8 @@ export async function createOrder(
     throw new Error('Invalid tool response: missing text in content');
   }
 
-  return JSON.parse(content.text);
+  const text = content.text;
+  return JSON.parse(text);
 }
 
 // This can be used for testing the client directly
@@ -159,11 +162,11 @@ if (require.main === module) {
     .then(async (client) => {
       // Example: List all products
       const products = await listAllProducts(client);
-      logger.info({ products }, 'Products retrieved');
+      logger.info({ productCount: products.length }, 'Products retrieved');
 
       // Example: Search for products
       const searchResults = await searchProducts(client, 'Product 1');
-      logger.info({ results: searchResults }, 'Search results');
+      logger.info({ resultCount: searchResults.length }, 'Search results');
 
       logger.info('MCP Client test completed');
     })
