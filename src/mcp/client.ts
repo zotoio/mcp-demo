@@ -161,21 +161,17 @@ if (require.main === module) {
   createMCPClient()
     .then(async (client) => {
       // Example: List all products
-      const products = (await listAllProducts(client)) as Array<{ name: string }>;
-      logger.info({ productCount: products.length }, 'Products retrieved');
+      const productsList = (await listAllProducts(client)) as Array<{ name: string; id: string }>;
+      logger.info({ productCount: productsList.length }, 'Products retrieved');
 
       // Example: Search for products
       const searchResults = (await searchProducts(client, 'Product 1')) as Array<{ name: string }>;
       logger.info({ resultCount: searchResults.length }, 'Search results');
 
       // Example: Create an order
-      // Get a real user ID from the database
-      const users = await client.readResource({ uri: 'products://all' });
-      const usersText = users.contents[0]?.text as string;
-      const products = JSON.parse(usersText) as Array<{ id: string }>;
-      
-      if (products.length > 0) {
-        const productId = products[0].id; // Use a real product ID
+      // Get a real product ID from the database
+      if (productsList.length > 0) {
+        const productId = productsList[0].id; // Use a real product ID
         (await createOrder(client, '00000000-0000-0000-0000-000000000000', [
           { productId, quantity: 1 },
         ])) as Record<string, unknown>;
