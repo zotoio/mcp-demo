@@ -40,15 +40,16 @@ This repository contains a TypeScript implementation of an e-commerce system tha
 
 ```
 src/
-├── adapters/         # External service adapters
-├── contexts/         # State containers
+├── adapters/         # External service adapters (DB and API)
+├── contexts/         # State containers for auth, products, orders
 ├── mcp/              # MCP implementation
-│   ├── client.ts     # MCP client
-│   ├── server.ts     # MCP server
+│   ├── client.ts     # MCP client implementation
+│   ├── server.ts     # MCP server implementation
 │   └── types.ts      # MCP type definitions
 ├── models/           # Data models with Zod validation
 ├── protocols/        # Service interfaces
 ├── services/         # Business logic implementations
+├── utils/            # Utility functions (logger)
 └── index.ts          # Application entry point
 ```
 
@@ -56,15 +57,15 @@ src/
 
 ### Prerequisites
 
-- Node.js (v14 or later)
+- Node.js (v20 or later)
 - Yarn or npm
 
 ### Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/mcp-typescript-example.git
-cd mcp-typescript-example
+git clone https://github.com/yourusername/mcp-demo.git
+cd mcp-demo
 
 # Install dependencies
 yarn install
@@ -73,21 +74,44 @@ yarn install
 ### Running the Example
 
 ```bash
+# Build the TypeScript code
+yarn build
+
 # Start the application
-yarn dev
+yarn start
 ```
 
 This will:
-1. Start the MCP server on port 8080
+1. Start the MCP server on port 3000
 2. Seed the database with sample data
 3. Run through some example operations
-4. Start an Express server on port 3000
+4. Start an Express server on port 3001
 
 ### Testing the MCP Client
 
 ```bash
-npx ts-node src/mcp/client.ts
+# Build the TypeScript code first
+yarn build
+
+# Run the client directly
+node dist/mcp/client.js
 ```
+
+## Features
+
+### Resources
+
+The MCP server exposes the following resources:
+
+- `products://all` - List all products
+- `products://{id}` - Get a specific product by ID
+
+### Tools
+
+The MCP server provides the following tools:
+
+- `searchProducts` - Search for products by name or description
+- `createOrder` - Create a new order with specified items
 
 ## Integrating with LLMs
 
@@ -97,10 +121,10 @@ npx ts-node src/mcp/client.ts
 
 1. Run the MCP server:
    ```bash
-   yarn dev
+   yarn start
    ```
 
-2. In Claude Desktop, connect to the MCP server at `http://localhost:8080`
+2. In Claude Desktop, connect to the MCP server at `http://localhost:3000/mcp`
 
 3. Claude can now access product information and create orders through the MCP server
 
@@ -117,8 +141,9 @@ async function queryProductsWithGPT() {
   const client = await createMCPClient();
   
   // Fetch products
-  const productsResource = await client.fetchResource('products');
-  const products = JSON.parse(productsResource.content);
+  const productsResource = await client.readResource({ uri: 'products://all' });
+  const productsText = productsResource.contents[0]?.text as string;
+  const products = JSON.parse(productsText);
   
   // Create OpenAI client
   const openai = new OpenAI({
