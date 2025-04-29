@@ -20,12 +20,12 @@ async function initializeApp() {
     const serverStartTime = Date.now();
     const mcpServer = await startServer();
     logger.performance('MCP Server startup', Date.now() - serverStartTime, {
-      serverName: mcpServer.name,
-      serverVersion: mcpServer.version
+      serverName: mcpServer.options?.name,
+      serverVersion: mcpServer.options?.version
     });
     logger.info({
-      name: mcpServer.name,
-      version: mcpServer.version
+      name: mcpServer.options?.name,
+      version: mcpServer.options?.version
     }, 'MCP Server initialized');
 
     // Start the main API server
@@ -60,8 +60,8 @@ async function initializeApp() {
     logger.info({ 
       productCount: products.length,
       firstProduct: products[0]?.name,
-      clientName: client.name,
-      clientVersion: client.version
+      clientName: client.options?.name,
+      clientVersion: client.options?.version
     }, 'Products retrieved via MCP');
     
     logger.info('Application initialization completed successfully');

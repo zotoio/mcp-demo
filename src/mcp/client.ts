@@ -21,8 +21,8 @@ export async function createMCPClient(serverUrl = 'http://localhost:3000/mcp') {
     // Try connecting with the modern Streamable HTTP transport first
     logger.debug('Creating StreamableHTTPClientTransport');
     const transport = new StreamableHTTPClientTransport(
-      new URL(serverUrl),
-      { debug: true } // Enable debug logging in the transport
+      new URL(serverUrl)
+      // Debug option removed as it's not supported in the type
     );
     
     logger.debug('Connecting client to transport');
@@ -30,8 +30,8 @@ export async function createMCPClient(serverUrl = 'http://localhost:3000/mcp') {
     logger.info({ 
       serverUrl,
       transportType: 'StreamableHTTP',
-      clientName: client.name,
-      clientVersion: client.version
+      clientName: client.options?.name,
+      clientVersion: client.options?.version
     }, `Connected to MCP server at ${serverUrl} using Streamable HTTP transport`);
     
     return client;
@@ -54,8 +54,8 @@ export async function createMCPClient(serverUrl = 'http://localhost:3000/mcp') {
       logger.info({ 
         serverUrl,
         transportType: 'SSE',
-        clientName: client.name,
-        clientVersion: client.version
+        clientName: client.options?.name,
+        clientVersion: client.options?.version
       }, `Connected to MCP server using SSE transport`);
       
       return client;

@@ -113,8 +113,8 @@ export async function startServer(port = 3000) {
   logger.info('Initializing StreamableHTTPServerTransport in stateless mode');
   const { StreamableHTTPServerTransport } = await import("@modelcontextprotocol/sdk/server/streamableHttp.js");
   const transport = new StreamableHTTPServerTransport({
-    sessionIdGenerator: undefined, // Use stateless mode for simplicity
-    debug: true, // Enable debug logging in the transport
+    sessionIdGenerator: undefined // Use stateless mode for simplicity
+    // Debug option removed as it's not supported in the type
   });
   
   // Create an Express app to handle the HTTP requests
@@ -155,8 +155,8 @@ export async function startServer(port = 3000) {
     logger.info({
       port,
       endpoint: '/mcp',
-      serverName: server.name,
-      serverVersion: server.version
+      serverName: server.options?.name,
+      serverVersion: server.options?.version
     }, `MCP Server listening on port ${port} with endpoint /mcp`);
   });
   

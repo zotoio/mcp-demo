@@ -12,7 +12,7 @@ const logger = pino({
       errorLikeObjectKeys: ['err', 'error'],
       levelFirst: true,
       customPrettifiers: {
-        time: (timestamp) => `[${timestamp}]`
+        time: (timestamp: string) => `[${timestamp}]`
       }
     },
   },
