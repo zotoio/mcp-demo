@@ -68,7 +68,7 @@ async function initializeApp() {
       {
         productCount: products.length,
         firstProduct: products[0]?.name || 'unknown',
-        clientName: 'E-Commerce MCP Client', // Use hardcoded values from client.ts
+        clientName: 'E-Commerce MCP Client',
         clientVersion: '1.0.0',
       },
       'Products retrieved via MCP'
