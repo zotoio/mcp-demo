@@ -1,4 +1,4 @@
-import type { AuthContext} from '../contexts/auth.context';
+import type { AuthContext } from '../contexts/auth.context';
 import { createDefaultAuthContext } from '../contexts/auth.context';
 import type { AuthProtocol } from '../protocols/auth.protocol';
 import { db } from '../adapters/db.adapter';

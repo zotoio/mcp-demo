@@ -1,4 +1,4 @@
-import { Order } from '../models/order.model';
+import type { Order } from '../models/order.model';
 import logger from '../utils/logger';
 
 export class ApiAdapter {

@@ -12,8 +12,8 @@ const logger = pino({
       errorLikeObjectKeys: ['err', 'error'],
       levelFirst: true,
       customPrettifiers: {
-        time: (timestamp: string) => `[${timestamp}]`
-      }
+        time: (timestamp: string) => `[${timestamp}]`,
+      },
     },
   },
   level: process.env.LOG_LEVEL || 'info',
@@ -21,14 +21,14 @@ const logger = pino({
     err: pino.stdSerializers.err,
     error: pino.stdSerializers.err,
     req: pino.stdSerializers.req,
-    res: pino.stdSerializers.res
+    res: pino.stdSerializers.res,
   },
   base: undefined, // Remove base log data like pid and hostname
   timestamp: () => `,"time":"${new Date().toISOString()}"`,
   redact: {
     paths: ['req.headers.authorization', '*.password', '*.token'],
-    censor: '[REDACTED]'
-  }
+    censor: '[REDACTED]',
+  },
 });
 
 // Add helper methods for common logging patterns
@@ -48,8 +48,11 @@ const enhancedLogger = {
   },
   // Log performance metrics
   performance: (operation: string, durationMs: number, metadata?: Record<string, unknown>) => {
-    logger.debug({ operation, durationMs, ...metadata }, `${operation} completed in ${durationMs}ms`);
-  }
+    logger.debug(
+      { operation, durationMs, ...metadata },
+      `${operation} completed in ${durationMs}ms`
+    );
+  },
 };
 
 export default enhancedLogger;

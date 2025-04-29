@@ -1,4 +1,4 @@
-import type { OrderContext} from '../contexts/order.context';
+import type { OrderContext } from '../contexts/order.context';
 import { createDefaultOrderContext } from '../contexts/order.context';
 import type { OrderProtocol } from '../protocols/order.protocol';
 import type { Order, OrderItem } from '../models/order.model';

@@ -1,4 +1,4 @@
-import { Product } from '../models/product.model';
+import type { Product } from '../models/product.model';
 export interface ProductContext {
   availableProducts: Product[];
   currentProduct: Product | null;

@@ -34,7 +34,7 @@ async function initializeApp() {
     // Start the main API server
     logger.info('Starting main API server');
     const app = express();
-    app.get('/', (_req: express.Request, res: express.Response) => res.send('MCP Example running'));
+    //app.get('/', (_req: express.Request, res: express.Response) => res.send('MCP Example running'));
     app.listen(3001, () => {
       logger.info(
         {
@@ -100,4 +100,4 @@ async function initializeApp() {
   }
 }
 
-initializeApp().catch((err) => logger.error({ err }, 'Application initialization failed'));
+initializeApp().catch((err) => logger.error(err, 'Application initialization failed'));

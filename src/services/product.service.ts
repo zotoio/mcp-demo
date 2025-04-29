@@ -1,4 +1,4 @@
-import type { ProductContext} from '../contexts/product.context';
+import type { ProductContext } from '../contexts/product.context';
 import { createDefaultProductContext } from '../contexts/product.context';
 import type { ProductProtocol } from '../protocols/product.protocol';
 import type { Product } from '../models/product.model';

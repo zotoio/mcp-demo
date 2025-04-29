@@ -1,4 +1,4 @@
-import { User } from '../models/user.model';
+import type { User } from '../models/user.model';
 export interface AuthContext {
   currentUser: User | null;
   isAuthenticated: boolean;

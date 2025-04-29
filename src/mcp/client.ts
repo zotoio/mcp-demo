@@ -161,18 +161,18 @@ if (require.main === module) {
   createMCPClient()
     .then(async (client) => {
       // Example: List all products
-      const products = await listAllProducts(client) as Array<{ name: string }>;
+      const products = (await listAllProducts(client)) as Array<{ name: string }>;
       logger.info({ productCount: products.length }, 'Products retrieved');
 
       // Example: Search for products
-      const searchResults = await searchProducts(client, 'Product 1') as Array<{ name: string }>;
+      const searchResults = (await searchProducts(client, 'Product 1')) as Array<{ name: string }>;
       logger.info({ resultCount: searchResults.length }, 'Search results');
 
       // Example: Create an order
-      await createOrder(client, 'user-id-here', [
+      (await createOrder(client, 'user-id-here', [
         { productId: 'product-id-here', quantity: 1 },
-      ]) as Record<string, unknown>;
-      
+      ])) as Record<string, unknown>;
+
       logger.info('MCP Client test completed');
     })
     .catch((err) => logger.error({ err: err as Error }, 'MCP Client error'));
