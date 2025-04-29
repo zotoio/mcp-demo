@@ -11,7 +11,7 @@ export class ProductService implements ProductProtocol {
   getContext() {
     return this.context;
   }
-  listProducts(): Promise<Product[]> {
+  listProducts(): Product[] {
     this.updateContext({ isLoading: true, error: null });
     try {
       const p = db.listProducts();
@@ -24,7 +24,7 @@ export class ProductService implements ProductProtocol {
       throw err;
     }
   }
-  getProduct(id: string): Promise<Product | null> {
+  getProduct(id: string): Product | null {
     this.updateContext({ isLoading: true, error: null });
     try {
       const p = db.getProduct(id);
@@ -37,7 +37,7 @@ export class ProductService implements ProductProtocol {
       throw err;
     }
   }
-  searchProducts(q: string): Promise<Product[]> {
+  searchProducts(q: string): Product[] {
     this.updateContext({ isLoading: true, error: null });
     try {
       const a = db.listProducts();

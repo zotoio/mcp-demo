@@ -77,11 +77,12 @@ async function initializeApp() {
     logger.info('Application initialization completed successfully');
   } catch (err) {
     const error = err as Error;
+    const typedError = error as Error;
     logger.error(
       {
-        err: error,
-        errorMessage: error.message,
-        errorStack: error.stack,
+        err: typedError,
+        errorMessage: typedError.message,
+        errorStack: typedError.stack,
         phase: 'initialization',
       },
       'Error in application initialization'

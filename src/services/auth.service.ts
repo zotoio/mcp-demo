@@ -11,7 +11,7 @@ export class AuthService implements AuthProtocol {
   getContext() {
     return this.context;
   }
-  login(email: string, _password: string): Promise<AuthContext> {
+  login(email: string, _password: string): AuthContext {
     const u = db.findUserByEmail(email);
     if (!u) throw new Error(`User with email ${email} not found`);
     const t = Buffer.from(`${u.id}:${Date.now()}`).toString('base64');
@@ -20,7 +20,7 @@ export class AuthService implements AuthProtocol {
   logout() {
     return this.updateContext(createDefaultAuthContext());
   }
-  register(email: string, name: string, _password: string): Promise<AuthContext> {
+  register(email: string, name: string, _password: string): AuthContext {
     if (db.findUserByEmail(email)) throw new Error(`User with email ${email} already exists`);
     const u = db.createUser({ email, name, role: 'customer' });
     const t = Buffer.from(`${u.id}:${Date.now()}`).toString('base64');

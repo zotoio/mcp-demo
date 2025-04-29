@@ -136,7 +136,7 @@ export async function startServer(port = 3000) {
         method: 'POST',
         path: '/mcp',
         headers: req.headers,
-        body: req.body,
+        body: req.body as Record<string, unknown>,
       },
       'Received MCP request'
     );
