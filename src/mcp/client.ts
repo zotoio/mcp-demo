@@ -168,6 +168,11 @@ if (require.main === module) {
       const searchResults = await searchProducts(client, 'Product 1') as Array<{ name: string }>;
       logger.info({ resultCount: searchResults.length }, 'Search results');
 
+      // Example: Create an order
+      const orderResult = await createOrder(client, 'user-id-here', [
+        { productId: 'product-id-here', quantity: 1 },
+      ]) as Record<string, unknown>;
+      
       logger.info('MCP Client test completed');
     })
     .catch((err) => logger.error({ err }, 'MCP Client error'));
