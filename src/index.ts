@@ -16,7 +16,7 @@ async function initializeApp() {
 
     // Start the main API server
     const app = express();
-    app.get('/', (_req, res) => res.send('MCP Example running'));
+    app.get('/', (_req: any, res: any) => res.send('MCP Example running'));
     app.listen(3001, () => logger.info('Main API server running on http://localhost:3001'));
     
     // Wait a moment for the server to fully initialize
