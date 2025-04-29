@@ -59,7 +59,15 @@ async function initializeApp() {
     const productsStartTime = Date.now();
     const mcpProducts = await client.readResource({ uri: 'products://all' });
     const productsText = mcpProducts.contents[0]?.text as string;
-    const products = JSON.parse(productsText) as Array<{ name: string }>;
+    // Explicitly type the parsed JSON to avoid unsafe assignment
+    interface Product {
+      name: string;
+      description: string;
+      price: number;
+      stock: number;
+      id: string;
+    }
+    const products = JSON.parse(productsText) as Product[];
     logger.performance('Products retrieval', Date.now() - productsStartTime, {
       productCount: products.length,
     });
