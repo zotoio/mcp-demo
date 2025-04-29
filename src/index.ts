@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import logger from './utils/logger';
 import { db } from './adapters/db.adapter';
 import { startServer } from './mcp/server';
@@ -16,7 +16,7 @@ async function initializeApp() {
 
     // Start the main API server
     const app = express();
-    app.get('/', (_req, res) => res.send('MCP Example running'));
+    //app.get('/', (_req, res) => res.send('MCP Example running'));
     app.listen(3001, () => logger.info('Main API server running on http://localhost:3001'));
     // Test the MCP client
     const client = await createMCPClient();

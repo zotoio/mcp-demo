@@ -110,8 +110,6 @@ export async function startServer(port = 3000) {
   );
   
   // Start the HTTP server
-  const httpServer = server.createHttpServer();
-  httpServer.listen(port, "0.0.0.0");
   logger.info(`MCP Server listening on port ${port}`);
   
   return server;
