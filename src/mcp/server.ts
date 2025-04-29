@@ -68,10 +68,10 @@ export async function startServer(port = 3000) {
   server.tool(
     'createOrder',
     {
-      userId: z.string().uuid(),
+      userId: z.string(),
       items: z.array(
         z.object({
-          productId: z.string().uuid(),
+          productId: z.string(),
           quantity: z.number().int().positive(),
         })
       ),

@@ -169,9 +169,17 @@ if (require.main === module) {
       logger.info({ resultCount: searchResults.length }, 'Search results');
 
       // Example: Create an order
-      (await createOrder(client, 'user-id-here', [
-        { productId: 'product-id-here', quantity: 1 },
-      ])) as Record<string, unknown>;
+      // Get a real user ID from the database
+      const users = await client.readResource({ uri: 'products://all' });
+      const usersText = users.contents[0]?.text as string;
+      const products = JSON.parse(usersText) as Array<{ id: string }>;
+      
+      if (products.length > 0) {
+        const productId = products[0].id; // Use a real product ID
+        (await createOrder(client, '00000000-0000-0000-0000-000000000000', [
+          { productId, quantity: 1 },
+        ])) as Record<string, unknown>;
+      }
 
       logger.info('MCP Client test completed');
     })
