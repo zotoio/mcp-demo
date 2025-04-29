@@ -1,5 +1,6 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
 import logger from "../utils/logger";
 
 /**
@@ -14,18 +15,29 @@ export async function createMCPClient(serverUrl = 'http://localhost:3000/mcp') {
     version: '1.0.0'
   });
 
-  // Connect to the MCP server
-  const transport = new StreamableHTTPClientTransport(
-    new URL(serverUrl)
-  );
-  
   try {
+    // Try connecting with the modern Streamable HTTP transport first
+    const transport = new StreamableHTTPClientTransport(
+      new URL(serverUrl)
+    );
+    
     await client.connect(transport);
-    logger.info(`Connected to MCP server at ${serverUrl}`);
+    logger.info(`Connected to MCP server at ${serverUrl} using Streamable HTTP transport`);
     return client;
   } catch (err) {
-    logger.error({ err }, `Failed to connect to MCP server at ${serverUrl}`);
-    throw err;
+    // If that fails, try the older SSE transport as fallback
+    logger.warn({ err }, `Streamable HTTP connection failed, falling back to SSE transport`);
+    
+    try {
+      const baseUrl = new URL(serverUrl);
+      const sseTransport = new SSEClientTransport(baseUrl);
+      await client.connect(sseTransport);
+      logger.info(`Connected to MCP server using SSE transport`);
+      return client;
+    } catch (fallbackErr) {
+      logger.error({ err: fallbackErr }, `All connection attempts to MCP server failed`);
+      throw fallbackErr;
+    }
   }
 }
 
