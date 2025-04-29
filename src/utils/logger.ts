@@ -11,9 +11,7 @@ const logger = pino({
       messageFormat: '{msg} {context}',
       errorLikeObjectKeys: ['err', 'error'],
       levelFirst: true,
-      customPrettifiers: {
-        time: (timestamp: string) => `[${timestamp}]`,
-      },
+      // Remove customPrettifiers as functions can't be cloned for worker threads
     },
   },
   level: process.env.LOG_LEVEL || 'info',
@@ -24,7 +22,7 @@ const logger = pino({
     res: pino.stdSerializers.res,
   },
   base: undefined, // Remove base log data like pid and hostname
-  timestamp: () => `,"time":"${new Date().toISOString()}"`,
+  timestamp: pino.stdTimeFunctions.isoTime, // Use built-in time function instead of custom one
   redact: {
     paths: ['req.headers.authorization', '*.password', '*.token'],
     censor: '[REDACTED]',

@@ -100,4 +100,4 @@ async function initializeApp() {
   }
 }
 
-initializeApp().catch((err) => logger.error(err, 'Application initialization failed'));
+initializeApp().catch((err) => logger.error({ err: err as Error }, 'Application initialization failed'));
