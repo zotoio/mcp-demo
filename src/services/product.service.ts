@@ -16,9 +16,10 @@ export class ProductService implements ProductProtocol {
       const p = await db.listProducts();
       this.updateContext({ availableProducts: p, isLoading: false });
       return p;
-    } catch (e) {
-      this.updateContext({ isLoading: false, error: e instanceof Error ? e : new Error(`Failed to list products: ${String(e)}`) });
-      throw e;
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(`Failed to list products: ${String(error)}`);
+      this.updateContext({ isLoading: false, error: err });
+      throw err;
     }
   }
   async getProduct(id: string) {
@@ -27,9 +28,10 @@ export class ProductService implements ProductProtocol {
       const p = await db.getProduct(id);
       this.updateContext({ currentProduct: p, isLoading: false });
       return p;
-    } catch (e) {
-      this.updateContext({ isLoading: false, error: e instanceof Error ? e : new Error(`Failed to get product: ${String(e)}`) });
-      throw e;
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(`Failed to get product: ${String(error)}`);
+      this.updateContext({ isLoading: false, error: err });
+      throw err;
     }
   }
   async searchProducts(q: string) {
@@ -41,9 +43,10 @@ export class ProductService implements ProductProtocol {
       );
       this.updateContext({ availableProducts: r, isLoading: false });
       return r;
-    } catch (e) {
-      this.updateContext({ isLoading: false, error: e instanceof Error ? e : new Error(`Failed to search products: ${String(e)}`) });
-      throw e;
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(`Failed to search products: ${String(error)}`);
+      this.updateContext({ isLoading: false, error: err });
+      throw err;
     }
   }
 }

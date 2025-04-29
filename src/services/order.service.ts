@@ -29,12 +29,13 @@ export class OrderService implements OrderProtocol {
       }
       this.updateContext({ currentOrder: uo, isProcessing: false });
       return uo;
-    } catch (e) {
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(`Failed to create order: ${String(error)}`);
       this.updateContext({ 
         isProcessing: false, 
-        error: e instanceof Error ? e : new Error(`Failed to create order: ${String(e)}`) 
+        error: err
       });
-      throw e;
+      throw err;
     }
   }
   async getOrder(id: string) {
@@ -43,12 +44,13 @@ export class OrderService implements OrderProtocol {
       const o = await db.getOrder(id);
       this.updateContext({ currentOrder: o, isProcessing: false });
       return o;
-    } catch (e) {
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(`Failed to get order: ${String(error)}`);
       this.updateContext({ 
         isProcessing: false, 
-        error: e instanceof Error ? e : new Error(`Failed to get order: ${String(e)}`) 
+        error: err
       });
-      throw e;
+      throw err;
     }
   }
   async getUserOrders(uid: string) {
@@ -57,12 +59,13 @@ export class OrderService implements OrderProtocol {
       const os = await db.getUserOrders(uid);
       this.updateContext({ orderHistory: os, isProcessing: false });
       return os;
-    } catch (e) {
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(`Failed to get user orders: ${String(error)}`);
       this.updateContext({ 
         isProcessing: false, 
-        error: e instanceof Error ? e : new Error(`Failed to get user orders: ${String(e)}`) 
+        error: err
       });
-      throw e;
+      throw err;
     }
   }
   async updateOrderStatus(id: string, status: Order['status']) {
@@ -73,12 +76,13 @@ export class OrderService implements OrderProtocol {
       if (status === 'shipped') await api.notifyShipping(uo);
       this.updateContext({ currentOrder: uo, isProcessing: false });
       return uo;
-    } catch (e) {
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(`Failed to update order status: ${String(error)}`);
       this.updateContext({ 
         isProcessing: false, 
-        error: e instanceof Error ? e : new Error(`Failed to update order status: ${String(e)}`) 
+        error: err
       });
-      throw e;
+      throw err;
     }
   }
 }

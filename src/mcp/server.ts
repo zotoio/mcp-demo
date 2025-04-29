@@ -1,13 +1,14 @@
 import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { db } from "../adapters/db.adapter";
+import logger from "../utils/logger";
+
 // Create an MCP server
-const startServer = () => {
+export async function startServer(port = 3000) {
   const server = new McpServer({
     name: "E-Commerce MCP Server",
     description: "Provides access to product catalog and order information",
     version: "1.0.0",
-
   });
 
   // Add a resource for all products
@@ -106,8 +107,11 @@ const startServer = () => {
       };
     }
   );
+  
+  // Start the HTTP server
+  await server.listen(port, "0.0.0.0");
+  logger.info(`MCP Server listening on port ${port}`);
+  
+  return server;
 }
-
-// Export the server for use in the HTTP setup
-export { startServer };
 

@@ -19,10 +19,14 @@ export async function createMCPClient(serverUrl = 'http://localhost:3000/mcp') {
     new URL(serverUrl)
   );
   
-  await client.connect(transport);
-  logger.info(`Connected to MCP server at ${serverUrl}`);
-
-  return client;
+  try {
+    await client.connect(transport);
+    logger.info(`Connected to MCP server at ${serverUrl}`);
+    return client;
+  } catch (err) {
+    logger.error({ err }, `Failed to connect to MCP server at ${serverUrl}`);
+    throw err;
+  }
 }
 
 // Example usage functions
