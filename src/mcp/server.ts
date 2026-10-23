@@ -46,7 +46,7 @@ export async function startServer(port = 3000) {
   );
 
   // Add a tool for searching products
-  server.tool('searchProducts', { query: z.string() }, ({ query }) => {
+  server.registerTool('searchProducts', { inputSchema: { query: z.string() } }, ({ query }) => {
     const allProducts = db.listProducts();
     const results = allProducts.filter(
       (p) =>
@@ -65,16 +65,18 @@ export async function startServer(port = 3000) {
   });
 
   // Add a tool for creating orders
-  server.tool(
+  server.registerTool(
     'createOrder',
     {
-      userId: z.string(),
-      items: z.array(
-        z.object({
-          productId: z.string(),
-          quantity: z.number().int().positive(),
-        })
-      ),
+      inputSchema: {
+        userId: z.string(),
+        items: z.array(
+          z.object({
+            productId: z.string(),
+            quantity: z.number().int().positive(),
+          })
+        ),
+      },
     },
     ({ userId, items }) => {
       // Calculate prices and create order items
