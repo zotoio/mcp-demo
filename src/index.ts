@@ -58,7 +58,8 @@ async function initializeApp() {
     logger.info('Retrieving products via MCP');
     const productsStartTime = Date.now();
     const mcpProducts = await client.readResource({ uri: 'products://all' });
-    const productsText = mcpProducts.contents[0]?.text as string;
+    const firstContent = mcpProducts.contents[0];
+    const productsText = (firstContent && 'text' in firstContent ? firstContent.text : '') as string;
     // Explicitly type the parsed JSON to avoid unsafe assignment
     interface Product {
       name: string;

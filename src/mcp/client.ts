@@ -91,11 +91,12 @@ export async function listAllProducts(client: Client) {
     uri: 'products://all',
   });
 
-  if (!resource.contents?.[0]?.text) {
+  const content = resource.contents?.[0];
+  if (!content || !('text' in content) || !content.text) {
     throw new Error('Invalid resource response: missing text content');
   }
 
-  const text = resource.contents[0]?.text as string;
+  const text = content.text as string;
   return JSON.parse(text) as unknown;
 }
 
